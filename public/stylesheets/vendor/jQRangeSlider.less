@@ -1,0 +1,102 @@
+/**
+ * default development theme for jQRangeSlider
+ * Using fam fam icon set from Mark James, http://www.famfamfam.com/lab//images/silk/ (Creative Commons Attribution 2.5 License)
+ */
+
+@rangeHeight:12px;
+
+.ui-rangeSlider{
+	
+	margin-top:25px;
+	height:@rangeHeight;
+	
+	.ui-rangeSlider-innerBar{
+		@innerBarHeight:@rangeHeight - 3px*2px;
+		height:@innerBarHeight;
+		margin:3px 6px;
+		background:lighten(@linkColor, 60);
+		.box-shadow(0 0 4px 0 fade(@linkColor, 70%) inset );
+		.border-radius(@innerBarHeight);
+	}
+	.ui-rangeSlider-handle{
+
+		width:@rangeHeight;
+		height:@rangeHeight;
+		.border-radius(@rangeHeight/2px);
+		cursor:col-resize;
+		background:@linkColor;
+	}
+	.ui-rangeSlider-bar{
+		@rangeVerticalMargin:3px;
+		margin: @rangeVerticalMargin 0;
+		background:lighten(@linkColor, 30);
+		height:@rangeHeight - @rangeVerticalMargin*2px;
+		cursor:move;
+		cursor:grab;
+		cursor: -moz-grab;
+	}
+}
+
+.ui-rangeSlider .ui-rangeSlider-bar.ui-draggable-dragging{
+	cursor:	-moz-grabbing;
+	cursor:grabbing;
+}
+
+.ui-rangeSlider-arrow{
+	height:16px;
+	margin:2px 0;
+	width:16px;
+	background-repeat:no-repeat;
+}
+
+.ui-rangeSlider-arrow.ui-rangeSlider-leftArrow{
+	background-image: url('/images/resultset_previous.png');
+	background-position:center left;
+}
+
+.ui-rangeSlider-arrow.ui-rangeSlider-rightArrow{
+	background-image: url('/images/resultset_next.png');
+	background-position:center right;
+}
+
+.ui-rangeSlider-arrow-inner{
+	display: none;
+}
+
+.ui-rangeSlider-container{
+	height:22px;
+}
+
+.ui-rangeSlider-withArrows .ui-rangeSlider-container{
+	margin:0 11px;
+}
+
+.ui-rangeSlider-noArrow .ui-rangeSlider-container{
+	margin:0;
+}
+
+.ui-rangeSlider-label{
+	color:white;
+	margin:0 2px 2px;
+	background-image:url('/images/label.png');
+	background-position:bottom center;
+	background-repeat:no-repeat;
+	white-space: nowrap;
+	bottom:@rangeHeight - 2px;
+	padding:3px 6px 7px;
+	cursor:col-resize;
+}
+
+.ui-rangeSlider-label-inner{
+	display:none;
+}
+
+/*
+ * Edit slider
+ */
+
+input.ui-editRangeSlider-inputValue{
+	width:3em;
+	vertical-align: middle;
+	text-align:center;
+}

@@ -1,0 +1,199 @@
+@import "vendor/bootstrap/bootstrap.less";
+@import "vendor/bootstrap/responsive.less";
+@import "vendor/jQRangeSlider.less";
+
+@activeColor:#B4131D;
+
+#workspace {    
+    margin:20px 20px;
+}
+
+#map {
+    padding:0;
+    width:auto;
+    height:600px;  
+    
+    position:relative;
+    z-index:30;    
+}
+
+.toolbox {
+    overflow:hidden;
+    border-bottom:1px solid #D7D7D7;    
+    padding:10px;
+    background:fade(#fafafa, 90%);    
+    
+    position:absolute;
+    top:0;
+    left:0;  
+    right:0; 
+    
+    z-index:40;    
+    
+    .hint {
+        font-size:16px;
+        &.first { font-weight:bold; } 
+    } 
+
+    .btn-play {
+        position:relative;
+        cursor:pointer;
+        display:block;
+        float:left;
+        width:40px;
+        height:40px;
+        margin-top:10px;
+        background:@linkColor;   
+        .border-radius(50%);
+        
+        &:after, &:before {  
+            content:"";          
+            position:absolute;            
+        }
+
+            
+        &:after {
+            text-align:center;
+            font-size:30px;
+            color:white;
+            width:100%;
+            padding-top:8px;
+            content:"▸";
+        }
+
+
+        &:before {
+            display:none;
+            border:5px solid white;
+            border-top:0;
+            border-bottom:0;
+            width:6px;
+            height:20px;
+            left:50%;
+            top:50%;
+            margin-left:(6px+10px)/-2px;
+            margin-top:20px/-2px;
+        }   
+        
+        &.pause {
+            
+            background:@activeColor;
+            
+            &:after {
+                display:none;
+            }
+            &:before {
+                display:block;
+            }    
+        } 
+    }
+
+    .ui-rangeSlider {
+
+        margin-left:60px;
+
+        .calendar-grid {
+            position:absolute;
+            top:-8px;
+            left:6px;
+            right:6px;
+            height:28px;            
+
+            .year, .month {
+                position:relative;                
+                float:left;
+                display:block;
+                height:100%;
+                margin:0;
+                padding:0;
+                
+                &:before {
+                    position:absolute;
+                    content:"";
+                    top:0;
+                    left:-1px;
+                    width:1px;
+                    height:100%;        
+                    background:fade(@linkColor, 30);                      
+                }   
+                
+                .date-label {
+                    position:absolute;
+                    display:block;
+                    bottom:80%;
+                    left:-25px;
+                    width:50px;
+                    color:@gray;
+                    text-align:center;
+                    height:100%;
+                }
+            }
+
+            .year {            
+                width:100%/3%;
+                                
+                &:before {     
+                    background:@linkColor;              
+                    width:3px
+                }
+            }
+
+            .month {
+                width:100%/12%;   
+                height:70%;
+                top:4px;
+                
+                .date-label {
+                    font-size:70%;
+                }                                     
+            }
+        }
+    }
+}
+
+.spinner {
+
+    .hide-text();
+    
+    background:fade(white, 90%);
+    position:absolute;
+    top:0;
+    left:0;
+    bottom:0;
+    right:0;
+    
+    z-index:40;
+    
+    overflow:hidden;
+    
+    &:after {
+        content:"Loading...";
+        position:absolute;
+        top:50%;
+        left:0; right:0;
+        text-align:center;
+        color:@gray;        
+        font-family:@sansFontFamily;       
+        font-size:16px;     
+    }
+}
+
+
+/*****
+ * BOOTSTAP OVERLOAD 
+ *****/
+
+.nav.nav-pills li a {
+    .border-radius(0);
+}
+
+.tab-pane {    
+    border:1px solid #D7D7D7;
+    background:#fff;   
+    position:relative;
+}
+
+body input[type=text]:focus, textarea:focus {
+    .box-shadow(none);
+    border-color:lighten(@linkColor, 20%);
+}

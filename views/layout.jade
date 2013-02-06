@@ -1,0 +1,25 @@
+doctype 5
+html
+  head
+    if typeof title !== "undefined"
+        title=title
+    link(rel='stylesheet', href='//fonts.googleapis.com/css?family=Rambla:400,700')
+    link(rel='stylesheet', href='/stylesheets/style.css')
+  body
+
+    #workspace
+
+        ul.nav.nav-pills
+            li(class=req.path == "/play" ? "active" : "")
+                a(href="/play") Play the history         
+            li(class=req.path == "/digg" ? "active" : "")
+                a(href="/digg") Digg into archive        
+    
+        .tab-content
+            .tab-pane.active
+                block content
+
+    script(src="/javascripts/vendor/jquery-1.7.1.min.js", type="text/javascript")
+    script(src="/javascripts/vendor/bootstrap.min.js", type="text/javascript")
+    block scripts
+        
