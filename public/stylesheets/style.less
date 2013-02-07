@@ -3,11 +3,13 @@
 @import "vendor/jQRangeSlider.less";
 
 @activeColor:#B4131D;
+@toolboxColor:#fafafa;
+@toolboxBorder:#D7D7D7;
 
+a:hover { text-decoration:none; }
 #workspace {    
     margin:20px 20px;
 }
-
 
 #map {
     padding:0;
@@ -15,11 +17,38 @@
     height:600px;  
     
     position:relative;
-    z-index:30;    
+    z-index:60;    
     overflow:hidden;
     
     svg {
         max-width:100%;
+    }
+
+    .js-back-to-world {        
+        z-index:50;   
+        position:absolute;
+        top:0;
+        right:0;
+        background:@toolboxColor;
+        color:@linkColor;
+        height:40px;   
+        width:40px;
+        font-size:40px;
+        line-height:40px;
+        text-align:center;  
+        border:1px solid @toolboxBorder;
+        border-top:0;
+        border-right:0;
+        cursor:pointer;    
+        .box-shadow(0 0 10px 0 fade(black, 10%));   
+        .translate(0%, 0);         
+        .transition(0.4s);
+        
+        .csstransforms &.hide {
+            display:block;
+            .box-shadow(0 0 20px 0 fade(black, 0%));
+            .translate(100%, 0);            
+        }    
     }
     
     #sidebar {
@@ -31,8 +60,8 @@
         bottom:0;
         background:#fafafa;
          
-        .translate(0%, 0);        
         .box-shadow(0 0 20px 0 fade(black, 20%));
+        .translate(0%, 0);        
         .transition(0.4s);
         
         .csstransforms &.hide {
@@ -49,7 +78,7 @@
             bottom:0;
             right:-1px;
             width:1px;
-            background:#D7D7D7;
+            background:@toolboxBorder;
         }
 
         a.close-sidebar {
@@ -58,6 +87,7 @@
             display:block;
             color:white;
             padding:3px 10px;
+            height:20px;
             text-transform:uppercase;
             cursor:pointer;
             font-weight:bold;
@@ -73,6 +103,11 @@
         }
 
         .js-content {
+
+            overflow:auto;
+            position:absolute;
+            top:26px; bottom:0;
+            left:0; right:0;
 
             .header {
 
@@ -120,19 +155,43 @@
             .go-to-docs {
                 margin:3%;
             }
+
+            .events {
+                h4 {                    
+                    margin:3%;
+                }
+
+                li {
+                    padding:3%;
+                    font-size:16px;
+                    border-top:1px solid @toolboxBorder;
+                    
+                    &:before {
+                        content:"";
+                        margin-right:5px;
+                        float:left;
+                        border:1px solid @toolboxBorder;
+                        height:16px;
+                        width:16px;
+                        display:block;
+                        background:url("http://en.wikipedia.org/favicon.ico") white;
+                    }
+                }
+            }
         }
     }
 }
 
 .toolbox {
     overflow:hidden;
-    border-bottom:1px solid #D7D7D7;    
+    border-bottom:1px solid @toolboxBorder;    
     padding:10px;
     background:#fafafa;
     margin:0;  
     
     position:relative;     
     z-index:40;        
+    .box-shadow(0 0 10px 0 fade(black, 10%));
     
     .hint {
         font-size:16px;
@@ -272,7 +331,7 @@
     bottom:0;
     right:0;
     
-    z-index:40;
+    z-index:100;
     
     overflow:hidden;
     display:none;
@@ -300,7 +359,7 @@
 }
 
 .tab-pane {    
-    border:1px solid #D7D7D7;
+    border:1px solid @toolboxBorder;
     background:#fff;   
     position:relative;
 }

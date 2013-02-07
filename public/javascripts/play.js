@@ -1,9 +1,14 @@
 (function(window, jQuery, undefined) {
     "use strict"
     var map, data, symbols, timer;
-    var $workspace, $form, $slider, $map, $sidebar;
+    var $workspace, $form, $slider, $map, $sidebar, $backToWorld;
 
     function createCountriesMap() {      
+
+        // Hides side bar
+        $sidebar.addClass("hide");
+        // Hides back button
+        $backToWorld.addClass("hide");
 
         map.loadMap('/data/world.svg', function(m) {
             // Set the map style/layers
@@ -17,23 +22,26 @@
 
     function createRegionsMap(data, path) {
         
+        // shows back button
+        $backToWorld.removeClass("hide");
+        
         // Loading mode
         $workspace.addClass("loading");
 
         // City selected, temporary back to the world map
         if(data.cy) return createCountriesMap();
 
-        var place = data.iso2 || data.lc;  
+        var country = data.iso2 || data.lc;          
 
-        map.loadMap("/region/" + place + ".svg", function(m) {
+        map.loadMap("/region/" + country + ".svg", function(m) {            
             // Set the map style/layers
             defaultMapLayers(m);
             // Load the data once
-            loadRegionsData(place);
+            loadRegionsData(country);
             // Updates value using the slider
-            $slider.off("valuesChanged").on("valuesChanged", function() {
-                // Load the data passing the place
-                loadRegionsData(place)
+            $slider.off("valuesChanged").on("valuesChanged", function() {                
+                // Load the data passing the country
+                loadRegionsData(country)
                 // Disable loading mode
                 $workspace.removeClass("loading");
             });
@@ -51,30 +59,36 @@
         $.getJSON("/count/countries.json", params, updateMapSymbols);
     }
 
-    function loadRegionsData(place) {
+    function loadRegionsData(country) {
 
         var slideValues = $slider.dateRangeSlider("values");
         var params = {
             start: slideValues.min.toISOString(), 
             end: slideValues.max.toISOString(),
-            regionFrom: place
+            regionFrom: country
         };
-        
+
+        if( ! $sidebar.hasClass("hide") ) loadCountrySidebar( $sidebar.data("country") );
+
         $.getJSON("/count/cities.json", params, updateMapSymbols);
     }
 
-    function loadCountrySidebar(place) {
+    function loadCountrySidebar(place) {        
 
+        var country = place.cy || place.lc || place;        
         var slideValues = $slider.dateRangeSlider("values");        
         // Creates the parameters object 
         var params = {
             startYear : slideValues.min.getFullYear(), 
             endYear   : slideValues.max.getFullYear(),
-            country   : place.cy || place.lc
+            country   : country
         };
 
-        // Stop auto-slide
-        stopTimer();
+        // Loading mode
+        $workspace.addClass("loading");
+
+        // Save the country related to the sidebar
+        $sidebar.data("country", country)
 
         // Load the sidebar html
         $.get("/play/sidebar", params, function(data) {
@@ -82,6 +96,8 @@
             $sidebar.find(".js-content").html(data)
             // Show the sidebar
             $sidebar.removeClass("hide");
+            // Disable loading mode
+            $workspace.removeClass("loading");
         })
     }
 
@@ -108,7 +124,7 @@
         var isItCity = !! data[0].cy;
 
         // Use bubble mode
-        if(isItCity) {
+        if(isItCity || 1) {
 
             var scale = $K.scale.sqrt(data, 'ct').range([0, 20]);
 
@@ -127,7 +143,13 @@
                     var fill = place.cy ? "fill:#B4131D;" : "fill:#3E6284;";
                     return fill + 'stroke: #fff; fill-opacity: 0.6;'
                 },
-                click: loadCountrySidebar
+                click: function(data) {                    
+                    // Stop auto-slide
+                    stopTimer();
+                    
+                    if(data.cy) loadCountrySidebar(data)
+                    else createRegionsMap(data)
+                }
             });
 
         } else {
@@ -179,8 +201,8 @@
                 stroke: '#aaa',
                 fill: '#fff',
                 'stroke-width': 1
-            },        
-            click: createRegionsMap
+            }        
+            //,click: createRegionsMap
         })
     }
 
@@ -191,12 +213,14 @@
 
     $(window).load(function() {      
         
-        $workspace = $("#workspace"),
-             $form = $workspace.find("form.toolbox"),
-           $slider = $form.find(".date-slider"),
-              $map = $("#map"),
-          $sidebar = $("#sidebar");
+          $workspace = $("#workspace"),
+               $form = $workspace.find("form.toolbox"),
+             $slider = $form.find(".date-slider"),
+                $map = $("#map"),
+            $sidebar = $("#sidebar");
+        $backToWorld = $map.find(".js-back-to-world");
 
+        // Loading mode on
         $workspace.addClass("loading");
 
         // Creates the slider
@@ -217,7 +241,7 @@
             },
             defaultValues:{
                 min: new Date(1973,1,1), 
-                max: new Date(1973,2,1)
+                max: new Date(1973,3,1)
             }
         });
 
@@ -253,8 +277,10 @@
         });
 
         $sidebar.on("click", ".close-sidebar", function() {
-            $sidebar.addClass("hide");
+            $sidebar.addClass("hide");            
         });
+
+        $map.on("click", ".js-back-to-world", createCountriesMap);
 
     });
 

@@ -7,7 +7,18 @@
         h3 What happened in&nbsp;<em>#{country.name}</em><br />between <em>#{startYear}</em>&nbsp;and&nbsp;<em>#{endYear}</em>?
     
 a.btn.btn-large.go-to-docs Launch search trough the documents
-h4 Remember, it was the period of:
-ul.unstyled
-    each e in events
-        li=e.name
+if events.length
+    .events
+        h4 Remember, it was the period of:
+        ul.unstyled
+            each e in events
+                li
+                    .label.pull-right
+                        if e.start_date < e.end_date
+                            =new Date(e.start_date).getFullYear()
+                            ="-"
+                            =new Date(e.end_date).getFullYear()
+                        else
+                            =new Date(e.start_date).getFullYear()
+
+                    a(href="http://en.wikipedia.org/wiki/index.html?curid="+e.key.value)=e.name

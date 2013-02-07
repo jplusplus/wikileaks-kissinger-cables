@@ -9,6 +9,8 @@ var citiesByMonth    = require("../public/data/cities_by_month.json");
 var countries        = require("../public/data/countries.json");
 // Every region analysed
 var regionCountries = {};
+// Every events recorded from Freebase
+var freebaseEvents  = [];
 
 /**
  * Play page
@@ -18,6 +20,10 @@ module.exports = function(app) {
 
     // Analyse every region files to extract there countries
     regionCountries = extractCountriesFromRegion()
+    // Extract freebase events
+    extractEventsFromFreebase(function(ev) {
+        freebaseEvents = ev;
+    });
 
     // Mains routers
     app.get("/play", playTheHistory);
@@ -56,7 +62,6 @@ var diggIntoArchive =  module.exports.diggIntoArchive = function (req, res) {
     res.render("digg");
 }
 
-
 /**
  * Play The History sidebar
  * @param  {Object} req User request
@@ -72,9 +77,22 @@ var playTheHistorySidebar =  module.exports.playTheHistorySidebar = function(req
         country   : country, 
         startYear : req.query.startYear, 
         endYear   : req.query.endYear,
-        events    : []
+        // Get the events for the given query    
+        events    : _.filter(freebaseEvents, function(ev) {
+            // Events in the given date basket
+            return ( ev.start_date == req.query.startYear || ev.start_date == req.query.startYear )                
+                && ( 
+                    // With the country in its name
+                    ev.name.toUpperCase().indexOf( country.name.toUpperCase() ) > -1
+                    // OR matching to the location
+                    || ev.locations.indexOf(country) > -1 
+                );
+        })
     });
-}
+
+};
+
+
 
 
 /**
@@ -149,7 +167,7 @@ var dataFile = module.exports.dataFile = function (req, res) {
  * @param  {String} place  Place (or country) to filter with
  * @return {String}        Region's file name
  */ 
-var getRegionFromPlace = function(place) {
+var getRegionFromPlace = module.exports.getRegionFromPlace = function(place) {
 
     // Get the region file
     for(var r in regionCountries) {
@@ -168,7 +186,7 @@ var getRegionFromPlace = function(place) {
  * @param  {Object} req User request
  * @param  {Object} res Server result
  */
-var goToRegionfile = function(req, res) {
+var goToRegionfile = module.exports.goToRegionfile = function(req, res) {
     
     // Get the country to look for
     var countryCode = (req.params.country || "").toUpperCase(),
@@ -181,7 +199,7 @@ var goToRegionfile = function(req, res) {
     }    
 }
 
-var isInRegionFile = function(code, fileName) {
+var isInRegionFile = module.exports.isInRegionFile = function(code, fileName) {
     return regionCountries[fileName].indexOf(code)  > -1;
 }
 
@@ -190,7 +208,7 @@ var isInRegionFile = function(code, fileName) {
  * @param  {Object} req User request
  * @param  {Object} res Server result
  */
-var goToPlay = function(req, res) {
+var goToPlay =  module.exports.goToPlay = function(req, res) {
     res.redirect("/play");
 }
 
@@ -200,7 +218,7 @@ var goToPlay = function(req, res) {
  * @param  {Array} docs Documents list
  * @return {Array}      Documents aggregated
  */
-function aggregateDocsByLocation(docs) {
+var aggregateDocsByLocation = module.exports.aggregateDocsByLocation = function(docs) {
 
     var groupedDocs = _.groupBy(docs, "lc");
 
@@ -216,8 +234,11 @@ function aggregateDocsByLocation(docs) {
 
 }
 
-
-function extractCountriesFromRegion() {
+/**
+ * Analyse every region file to know wich countries are available in 
+ * @return {Object} Countries available by region file
+ */
+var extractCountriesFromRegion = module.exports.extractCountriesFromRegion = function() {
 
     // Library to parse XML
     var libxmljs = require('libxmljs');
@@ -251,4 +272,33 @@ function extractCountriesFromRegion() {
     });
 
     return res;
+}
+
+/**
+ * Extract every event between the given basket from Freebase
+ * @param  {Function} callback Callback function, receiving the data
+ */
+var extractEventsFromFreebase = module.exports.extractEventsFromFreebase = function (callback) {
+
+    var dateBasket = ["1973", "1974", "1975", "1976"];
+    // Create the query to freebase to extract event
+    query=[{
+        "id":         null, 
+        "name":       null, 
+        "start_date": null, 
+        "end_date":   null,
+        "type":       "/time/event",
+        "key": {      // Get the wikipedia key (en)
+            "namespace": "/wikipedia/en_id",  
+            "value":     null,
+            "limit":     1
+        },
+        "locations":[],
+        "start_date|=": dateBasket,
+        "or:end_date|=": dateBasket
+    }];
+
+
+    // Gets tge data from freebase
+    freebase.paginate(query, {}, callback || function() {});
 }
