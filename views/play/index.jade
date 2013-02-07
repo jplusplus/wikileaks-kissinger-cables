@@ -1,4 +1,4 @@
-extends layout
+extends ../layout
 
 block scripts
     script(src="/javascripts/vendor/jquery.timer.js", type="text/javascript")
@@ -18,7 +18,7 @@ block content
             .span3
                 .hint.first Click PLAY to retrace the history.
                 .hint You can move the cursor to find which countries were mentioned at the selected date range.            
-            .span9
+            .span9.timeline
                 a.btn-play
                 .date-slider
                     .calendar-grid  
@@ -29,6 +29,10 @@ block content
                                     .month
                                         if month > 1
                                             .date-label.hidden-phone=month
-                            
+
     #map
-    .spinner Loading
+        .row-fluid
+            #sidebar.span4.hide
+                a.close-sidebar Close
+                .js-content
+        .spinner Loading

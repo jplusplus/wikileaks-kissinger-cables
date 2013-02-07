@@ -10,6 +10,7 @@
     "jade": "*",
     "less-middleware": "*",
     "underscore": "*",
-    "libxmljs": "latest"
+    "libxmljs": "latest",
+    "freebase": "2.1.0"
   }
 }

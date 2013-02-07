@@ -1,0 +1,13 @@
+.header
+    .flag
+        img(src="/images/flags/"+country.iso+".gif",alt="country flag")
+    if startYear === endYear
+        h3 What happened in&nbsp;<em>#{country.name}</em><br />in&nbsp;<em>#{endYear}</em>?
+    else
+        h3 What happened in&nbsp;<em>#{country.name}</em><br />between <em>#{startYear}</em>&nbsp;and&nbsp;<em>#{endYear}</em>?
+    
+a.btn.btn-large.go-to-docs Launch search trough the documents
+h4 Remember, it was the period of:
+ul.unstyled
+    each e in events
+        li=e.name

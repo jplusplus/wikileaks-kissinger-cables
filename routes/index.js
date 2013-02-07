@@ -1,10 +1,12 @@
 // Dependencies
-var _  = require("underscore");
-var fs = require("fs");
+var    _ = require("underscore"),
+      fs = require("fs"),
+freebase = require("freebase");
 
 // Get the data from JSON files
 var countriesByMonth = require("../public/data/countries_by_month.json");
 var citiesByMonth    = require("../public/data/cities_by_month.json");
+var countries        = require("../public/data/countries.json");
 // Every region analysed
 var regionCountries = {};
 
@@ -17,9 +19,12 @@ module.exports = function(app) {
     // Analyse every region files to extract there countries
     regionCountries = extractCountriesFromRegion()
 
-    // Mains routeurs
+    // Mains routers
     app.get("/play", playTheHistory);
     app.get("/digg", diggIntoArchive);
+
+    // Contextual routers
+    app.get("/play/sidebar", playTheHistorySidebar);
 
     // Data files
     app.get("/count/:resource.json", dataFile);
@@ -49,6 +54,26 @@ var playTheHistory =  module.exports.playTheHistory = function(req, res) {
  */
 var diggIntoArchive =  module.exports.diggIntoArchive = function (req, res) {
     res.render("digg");
+}
+
+
+/**
+ * Play The History sidebar
+ * @param  {Object} req User request
+ * @param  {Object} res Server result
+ */
+var playTheHistorySidebar =  module.exports.playTheHistorySidebar = function(req, res) {
+    // Looks for the country
+    var country = _.findWhere(countries, {iso:req.query.country});
+    // Country not found
+    if(!country) return res.send(404, 'Sorry, we cannot find that country!');
+
+    res.render("play/sidebar", {
+        country   : country, 
+        startYear : req.query.startYear, 
+        endYear   : req.query.endYear,
+        events    : []
+    });
 }
 
 
@@ -107,7 +132,7 @@ var dataFile = module.exports.dataFile = function (req, res) {
         var region = getRegionFromPlace(req.query.regionFrom);
 
         // Filters using this region
-        json = _.filter(json, function(l) {            
+        json = _.filter(json, function(l) {
             return isInRegionFile(l.cy, region);
         });
     }

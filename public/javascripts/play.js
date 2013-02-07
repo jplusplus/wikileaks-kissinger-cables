@@ -1,7 +1,7 @@
 (function(window, jQuery, undefined) {
     "use strict"
     var map, data, symbols, timer;
-    var $workspace, $form, $slider, $map;
+    var $workspace, $form, $slider, $map, $sidebar;
 
     function createCountriesMap() {      
 
@@ -16,7 +16,10 @@
     }
 
     function createRegionsMap(data, path) {
-           
+        
+        // Loading mode
+        $workspace.addClass("loading");
+
         // City selected, temporary back to the world map
         if(data.cy) return createCountriesMap();
 
@@ -31,6 +34,8 @@
             $slider.off("valuesChanged").on("valuesChanged", function() {
                 // Load the data passing the place
                 loadRegionsData(place)
+                // Disable loading mode
+                $workspace.removeClass("loading");
             });
         });
     }
@@ -58,6 +63,28 @@
         $.getJSON("/count/cities.json", params, updateMapSymbols);
     }
 
+    function loadCountrySidebar(place) {
+
+        var slideValues = $slider.dateRangeSlider("values");        
+        // Creates the parameters object 
+        var params = {
+            startYear : slideValues.min.getFullYear(), 
+            endYear   : slideValues.max.getFullYear(),
+            country   : place.cy || place.lc
+        };
+
+        // Stop auto-slide
+        stopTimer();
+
+        // Load the sidebar html
+        $.get("/play/sidebar", params, function(data) {
+            // Find the place to insert HTML
+            $sidebar.find(".js-content").html(data)
+            // Show the sidebar
+            $sidebar.removeClass("hide");
+        })
+    }
+
     function updateMapSymbols(d) {
 
         /**
@@ -78,10 +105,10 @@
         
         // The following assetion determines the mode:
         // is the country in a separate field (city view) ? 
-        var isBublleMode = !! data[0].cy;
+        var isItCity = !! data[0].cy;
 
         // Use bubble mode
-        if(isBublleMode) {
+        if(isItCity) {
 
             var scale = $K.scale.sqrt(data, 'ct').range([0, 20]);
 
@@ -100,7 +127,7 @@
                     var fill = place.cy ? "fill:#B4131D;" : "fill:#3E6284;";
                     return fill + 'stroke: #fff; fill-opacity: 0.6;'
                 },
-                click: createRegionsMap
+                click: loadCountrySidebar
             });
 
         } else {
@@ -121,7 +148,7 @@
         }
     
 
-        $workspace.find(".spinner").addClass("hide");
+        $workspace.removeClass("loading");
     }
 
     function defaultMapLayers(m) {
@@ -157,12 +184,20 @@
         })
     }
 
+    function stopTimer() {
+        timer.stop();
+        $form.find(".btn-play").removeClass("pause");
+    }
+
     $(window).load(function() {      
         
         $workspace = $("#workspace"),
              $form = $workspace.find("form.toolbox"),
            $slider = $form.find(".date-slider"),
-              $map = $("#map");
+              $map = $("#map"),
+          $sidebar = $("#sidebar");
+
+        $workspace.addClass("loading");
 
         // Creates the slider
         $slider.dateRangeSlider({
@@ -197,8 +232,7 @@
             $slider.dateRangeSlider('scrollRight', 1);
 
             if( slideValues.max >= new Date(1975,12,1) ) {
-                timer.stop();
-                $form.find(".btn-play").removeClass("pause");
+                stopTimer();
             }
 
         }, 500);
@@ -216,6 +250,10 @@
          
             timer.toggle();
             $form.find(".btn-play").toggleClass("pause", timer.isActive );                  
+        });
+
+        $sidebar.on("click", ".close-sidebar", function() {
+            $sidebar.addClass("hide");
         });
 
     });
