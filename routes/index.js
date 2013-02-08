@@ -21,8 +21,12 @@ module.exports = function(app) {
     // Analyse every region files to extract there countries
     regionCountries = extractCountriesFromRegion()
     // Extract freebase events
-    extractEventsFromFreebase(function(ev) {
-        freebaseEvents = ev;
+    extractEventsFromFreebase(function(events) {        
+        freebaseEvents = _.map(events, function(e) {
+            e.start_date = new Date(e.start_date).getFullYear(); 
+            e.end_date   = new Date(e.end_date).getFullYear(); 
+            return e;
+        });
     });
 
     // Mains routers
@@ -80,12 +84,13 @@ var playTheHistorySidebar =  module.exports.playTheHistorySidebar = function(req
         // Get the events for the given query    
         events    : _.filter(freebaseEvents, function(ev) {
             // Events in the given date basket
-            return ( ev.start_date == req.query.startYear || ev.start_date == req.query.startYear )                
-                && ( 
+            return (  ( ev.start_date >= req.query.startYear && ev.start_date <= req.query.endYear )                
+                   || ( ev.end_date   >= req.query.startYear && ev.end_date   <= req.query.endYear )                
+                ) && ( 
                     // With the country in its name
                     ev.name.toUpperCase().indexOf( country.name.toUpperCase() ) > -1
                     // OR matching to the location
-                    || ev.locations.indexOf(country) > -1 
+                    || ev.locations.indexOf(country.name) > -1 
                 );
         })
     });
@@ -106,7 +111,7 @@ var dataFile = module.exports.dataFile = function (req, res) {
     // Get the data according the resource name
     switch(req.params.resource) {
         case "countries":
-            json = countriesByMonth;
+            json = countriesByMonth;            
             break;
         case "cities":
             json = citiesByMonth;            
@@ -157,6 +162,14 @@ var dataFile = module.exports.dataFile = function (req, res) {
 
     // Aggregate the data
     json = aggregateDocsByLocation(json);    
+
+    // Expend location label
+    json = _.map(json, function(d) {
+        // Looks for the country
+        var country = _.findWhere(countries, {iso: d.cy || d.lc} );
+        d.label = country ? country.name : "";
+        return d;
+    });
 
     // Return the data in JSON
     res.json(json);
@@ -244,14 +257,20 @@ var extractCountriesFromRegion = module.exports.extractCountriesFromRegion = fun
     var libxmljs = require('libxmljs');
     // Files directory
     var dir = './public/data/';
-    // Files to fetch
-    var regionFiles = [
+    // Files to fetch 
+    // ORDER IS IMPORTANT: it defines priority when a country is in 2 regions
+    var regionFiles = [        
+        "region-mo.svg",
         "region-na.svg",
-        "region-eu.svg",
+        "region-ca.svg",
+        "region-euw.svg",
+        "region-eun.svg",
+        "region-eus.svg",
+        "region-eue.svg",
         "region-sa.svg",
-        "region-as.svg",
+        "region-oc.svg",
         "region-af.svg",
-        "region-oc.svg"
+        "region-as.svg"
     ];                
 
     // Object to recolt the regions' countries
@@ -262,7 +281,7 @@ var extractCountriesFromRegion = module.exports.extractCountriesFromRegion = fun
         
         var file = libxmljs.parseXml( fs.readFileSync(dir+fileName) ),
         // Get every paths containing country id
-           paths = file.find('//xmlns:path[@data-iso2]', 'http://www.w3.org/2000/svg');
+           paths = file.find('//xmlns:g[@id="countries"]//xmlns:path[@data-iso2]', 'http://www.w3.org/2000/svg');
 
         // Extract every country ids
         res[fileName] = _.map(paths, function(path) { 
@@ -294,8 +313,8 @@ var extractEventsFromFreebase = module.exports.extractEventsFromFreebase = funct
             "limit":     1
         },
         "locations":[],
-        "start_date|=": dateBasket,
-        "or:end_date|=": dateBasket
+        "start_date>=": "1973",
+        "end_date<=": "1976"
     }];
 
 

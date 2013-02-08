@@ -15,10 +15,10 @@ if events.length
                 li
                     .label.pull-right
                         if e.start_date < e.end_date
-                            =new Date(e.start_date).getFullYear()
+                            =e.start_date
                             ="-"
-                            =new Date(e.end_date).getFullYear()
+                            =e.end_date
                         else
-                            =new Date(e.start_date).getFullYear()
+                            =e.start_date
 
                     a(href="http://en.wikipedia.org/wiki/index.html?curid="+e.key.value)=e.name
