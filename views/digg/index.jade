@@ -1,1 +1,62 @@
 extends ../layout
+
+block stylesheets
+    style 
+        .axis path,
+        .axis line {
+          fill: none;
+          stroke: #000;
+          shape-rendering: crispEdges;
+        }
+
+        .x.axis path {
+          display: none;
+        }
+
+        .line {
+          fill: none;
+          stroke: steelblue;
+          stroke-width: 1.5px;
+        }
+
+block content
+    form.toolbox
+        .row-fluid          
+            .span6        
+                h3.hint What? 
+                .hint Find the evolution of a trending topic into the documents, between 1973 and 1976.
+                .input-append.top10
+                    input(type="text",name="terms", placeholder="Comma-separated words: Watergate, Nixon, etc").span11
+                    button(tye="submit").btn Search            
+            .span5.hidden-phone.need-inspiration                          
+                h3.hint Need inspiration?
+                .hint Try the following terms:
+
+
+    #trends
+        .spinner Loading       
+
+        .left20.right20.relative
+            .calendar-grid.bottom-label  
+                - for(var year=1973; year<=1976; year++)                    
+                    .year
+                        .date-label=year
+                        - for(var month=1; month<=12; month++)
+                            .month
+                                if month > 1
+                                    .date-label.hidden-phone=month                
+        #graph
+        //-.tools
+            .row-fluid
+                .span7
+                .span5.tr
+                    select
+                        option Politic        
+                        option Economic        
+                        option Scientific       
+                        option All    
+
+
+block scripts
+    script(src="/javascripts/vendor/d3.v3.min.js", type="text/javascript")
+    script(src="/javascripts/digg.js", type="text/javascript")

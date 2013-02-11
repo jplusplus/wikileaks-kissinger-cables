@@ -1,33 +1,12 @@
 // Dependencies
 var    _ = require("underscore"),
-      fs = require("fs"),
-freebase = require("freebase");
-
-// Get the data from JSON files
-var countriesByMonth = require("../public/data/countries_by_month.json");
-var citiesByMonth    = require("../public/data/cities_by_month.json");
-var countries        = require("../public/data/countries.json");
-// Every region analysed
-var regionCountries = {};
-// Every events recorded from Freebase
-var freebaseEvents  = [];
+    data = require("../data")(); // Initialize data
 
 /**
  * Play page
  * @param  {Object} req User request
  */
 module.exports = function(app) {
-
-    // Analyse every region files to extract there countries
-    regionCountries = extractCountriesFromRegion()
-    // Extract freebase events
-    extractEventsFromFreebase(function(events) {        
-        freebaseEvents = _.map(events, function(e) {
-            e.start_date = new Date(e.start_date).getFullYear(); 
-            e.end_date   = new Date(e.end_date).getFullYear(); 
-            return e;
-        });
-    });
 
     // Mains routers
     app.get("/play", playTheHistory);
@@ -54,7 +33,7 @@ module.exports = function(app) {
  * @param  {Object} res Server result
  */
 var playTheHistory =  module.exports.playTheHistory = function(req, res) {
-    res.render("play");
+    res.render("play", {title: "Play the history"});
 }
 
 /**
@@ -63,7 +42,7 @@ var playTheHistory =  module.exports.playTheHistory = function(req, res) {
  * @param  {Object} res Server result
  */
 var diggIntoArchive =  module.exports.diggIntoArchive = function (req, res) {
-    res.render("digg");
+    res.render("digg", {title: "Digg into archive"});
 }
 
 /**
@@ -73,7 +52,7 @@ var diggIntoArchive =  module.exports.diggIntoArchive = function (req, res) {
  */
 var playTheHistorySidebar =  module.exports.playTheHistorySidebar = function(req, res) {
     // Looks for the country
-    var country = _.findWhere(countries, {iso:req.query.country});
+    var country = _.findWhere(data.countries, {iso:req.query.country});
     // Country not found
     if(!country) return res.send(404, 'Sorry, we cannot find that country!');
 
@@ -82,7 +61,7 @@ var playTheHistorySidebar =  module.exports.playTheHistorySidebar = function(req
         startYear : req.query.startYear, 
         endYear   : req.query.endYear,
         // Get the events for the given query    
-        events    : _.filter(freebaseEvents, function(ev) {
+        events    : _.filter(data.freebaseEvents, function(ev) {
             // Events in the given date basket
             return (  ( ev.start_date >= req.query.startYear && ev.start_date <= req.query.endYear )                
                    || ( ev.end_date   >= req.query.startYear && ev.end_date   <= req.query.endYear )                
@@ -111,14 +90,27 @@ var dataFile = module.exports.dataFile = function (req, res) {
     // Get the data according the resource name
     switch(req.params.resource) {
         case "countries":
-            json = countriesByMonth;            
+            json = data.countriesByMonth;            
             break;
         case "cities":
-            json = citiesByMonth;            
+            json = data.citiesByMonth;            
+            break;
+        case "ngrams":
+            return data.getNgramByWeek(req.query.q, function(err, result) {                
+                if(err) {
+                    res.json({"error": err});
+                } else {                    
+                    for(var r in result) {
+                        result[r] = result[r].rows;
+                    }
+                    // Return the data in JSON
+                    res.json(result);
+                }
+            });          
             break;
     }
 
-    // Filter the data    
+    // Filter data from static files    
     // ...by start date
     if(req.query.start) {
         var start = ( Date.parse(req.query.start)-60 )/1000; // Fix UTC swift               
@@ -152,21 +144,21 @@ var dataFile = module.exports.dataFile = function (req, res) {
     if(req.query.regionFrom) {
         
         // Find the region matching to the given place
-        var region = getRegionFromPlace(req.query.regionFrom);
+        var region = data.getRegionFromPlace(req.query.regionFrom);
 
         // Filters using this region
         json = _.filter(json, function(l) {
-            return isInRegionFile(l.cy, region);
+            return data.isInRegionFile(l.cy, region);
         });
     }
 
     // Aggregate the data
-    json = aggregateDocsByLocation(json);    
+    json = data.aggregateDocsByLocation(json);    
 
     // Expend location label
     json = _.map(json, function(d) {
         // Looks for the country
-        var country = _.findWhere(countries, {iso: d.cy || d.lc} );
+        var country = _.findWhere(data.countries, {iso: d.cy || d.lc} );
         d.label = country ? country.name : "";
         return d;
     });
@@ -175,24 +167,6 @@ var dataFile = module.exports.dataFile = function (req, res) {
     res.json(json);
 }
 
-/**
- * Get the region file matching to the given place
- * @param  {String} place  Place (or country) to filter with
- * @return {String}        Region's file name
- */ 
-var getRegionFromPlace = module.exports.getRegionFromPlace = function(place) {
-
-    // Get the region file
-    for(var r in regionCountries) {
-        // Do the country exist in the curent region file ?
-        if( isInRegionFile(place, r) ) {
-            // File name is the key
-            return r;            
-        }
-    } 
-
-    return false;
-}
 
 /**
  * Redirect to the region file matching to the given country
@@ -203,7 +177,7 @@ var goToRegionfile = module.exports.goToRegionfile = function(req, res) {
     
     // Get the country to look for
     var countryCode = (req.params.country || "").toUpperCase(),
-           fileName = getRegionFromPlace(countryCode);
+           fileName = data.getRegionFromPlace(countryCode);
 
     if(fileName) {
         res.redirect("/data/" + fileName);
@@ -212,9 +186,6 @@ var goToRegionfile = module.exports.goToRegionfile = function(req, res) {
     }    
 }
 
-var isInRegionFile = module.exports.isInRegionFile = function(code, fileName) {
-    return regionCountries[fileName].indexOf(code)  > -1;
-}
 
 /**
  * Redirect to Play page
@@ -225,99 +196,3 @@ var goToPlay =  module.exports.goToPlay = function(req, res) {
     res.redirect("/play");
 }
 
-
-/**
- * Aggregates every given documents by location key
- * @param  {Array} docs Documents list
- * @return {Array}      Documents aggregated
- */
-var aggregateDocsByLocation = module.exports.aggregateDocsByLocation = function(docs) {
-
-    var groupedDocs = _.groupBy(docs, "lc");
-
-    return _.map(groupedDocs, function(docs) {
-
-        doc = docs[0];
-        doc.ct = _.reduce(docs, function(sum,n) {                                        
-            return sum += 1*n.ct;
-        }, 0);
-
-        return doc;
-    });
-
-}
-
-/**
- * Analyse every region file to know wich countries are available in 
- * @return {Object} Countries available by region file
- */
-var extractCountriesFromRegion = module.exports.extractCountriesFromRegion = function() {
-
-    // Library to parse XML
-    var libxmljs = require('libxmljs');
-    // Files directory
-    var dir = './public/data/';
-    // Files to fetch 
-    // ORDER IS IMPORTANT: it defines priority when a country is in 2 regions
-    var regionFiles = [        
-        "region-mo.svg",
-        "region-na.svg",
-        "region-ca.svg",
-        "region-euw.svg",
-        "region-eun.svg",
-        "region-eus.svg",
-        "region-eue.svg",
-        "region-sa.svg",
-        "region-oc.svg",
-        "region-af.svg",
-        "region-as.svg"
-    ];                
-
-    // Object to recolt the regions' countries
-    var res = {};
-    
-    // Analyse each files
-    regionFiles.forEach(function(fileName) {
-        
-        var file = libxmljs.parseXml( fs.readFileSync(dir+fileName) ),
-        // Get every paths containing country id
-           paths = file.find('//xmlns:g[@id="countries"]//xmlns:path[@data-iso2]', 'http://www.w3.org/2000/svg');
-
-        // Extract every country ids
-        res[fileName] = _.map(paths, function(path) { 
-            return (path.attr('data-iso2').value()  || "").toUpperCase();
-        });
-
-    });
-
-    return res;
-}
-
-/**
- * Extract every event between the given basket from Freebase
- * @param  {Function} callback Callback function, receiving the data
- */
-var extractEventsFromFreebase = module.exports.extractEventsFromFreebase = function (callback) {
-
-    var dateBasket = ["1973", "1974", "1975", "1976"];
-    // Create the query to freebase to extract event
-    query=[{
-        "id":         null, 
-        "name":       null, 
-        "start_date": null, 
-        "end_date":   null,
-        "type":       "/time/event",
-        "key": {      // Get the wikipedia key (en)
-            "namespace": "/wikipedia/en_id",  
-            "value":     null,
-            "limit":     1
-        },
-        "locations":[],
-        "start_date>=": "1973",
-        "end_date<=": "1976"
-    }];
-
-
-    // Gets tge data from freebase
-    freebase.paginate(query, {}, callback || function() {});
-}
