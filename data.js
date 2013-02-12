@@ -11,8 +11,21 @@ module.exports = function() {
 
     // Get data from JSON files
     module.exports.countriesByMonth = require("./public/data/countries_by_month.json");
-    module.exports.citiesByMonth = require("./public/data/cities_by_month.json");
-    module.exports.countries = require("./public/data/countries.json");
+    module.exports.citiesByMonth    = require("./public/data/cities_by_month.json");
+    module.exports.countries        = require("./public/data/countries.json");
+    module.exports.docCountByWeek   = require("./public/data/doc_count_by_week.json");
+    // Doc count must be date-formated
+    module.exports.docCountByWeek   = _.map(module.exports.docCountByWeek, function(c) {
+        c.dt = new Date( (c.dt)*1000);
+        // Database rows have the date format YYYYMMDD
+        // We must convet the week's date
+        var dt = [ c.dt.getFullYear() ] 
+        // Two digits format
+        dt.push( ("0" + ( 1*c.dt.getMonth() + 1) ).slice(-2) );
+        dt.push( ("0" + c.dt.getDate()).slice(-2) );
+        c.dt = dt.join("");
+        return c;
+    });
 
     // Analyse every region files to extract there countries
     module.exports.regionCountries = extractCountriesFromRegion()
@@ -27,6 +40,7 @@ module.exports = function() {
             e.end_date   = new Date(e.end_date).getFullYear(); 
             return e;
         });
+        console.log("%d events extracted from Freebase.", events.length)
     });
 
     // Create db connexion (use environment variable if exists)
@@ -181,13 +195,18 @@ var getNgramByWeek = module.exports.getNgramByWeek = function(query, callback) {
     var limit = 3;
 
     for( var t in terms )  {    
-        var term = terms[t];
+        var term = terms[t].trim();
         // Create a closure function
         queries[term] = function(term)  { 
-            function exec(callback) {
-                dbClient.query("SELECT to_char(\"Weeks\",'YYYYMMDD') as date, nb FROM cable_ngram_weeks WHERE ngram = $1", [term], callback); 
+            return function(callback) {
+                
+                var q = [];
+                q.push("SELECT to_char(\"Weeks\",'YYYYMMDD') as dt, nb as ct");
+                q.push("FROM cable_ngram_weeks");
+                q.push("WHERE ngram = $1");
+
+                dbClient.query(q.join(" "), [term], callback); 
             }
-            return exec;
         }(term);
 
         // Check and update the number of queries left
@@ -196,6 +215,38 @@ var getNgramByWeek = module.exports.getNgramByWeek = function(query, callback) {
 
     // Send all queries at the same time (maximum 3)
     async.parallel(queries, callback)
-
     
+};
+
+/**
+ * Transpose database rows to document's count by week
+ * @param  {Array} rows Rows to transpose
+ * @return {Array}      Rows transposed
+ */
+var transposeToWeekCount = module.exports.transposeToWeekCount = function(rows) {
+    
+    var all = _.map(module.exports.docCountByWeek, function(week) {
+        
+        var data = {
+             // Total number of document
+            tt: week.ct,
+            dt: week.dt
+        };
+
+        var row = _.findWhere(rows, { dt: week.dt });
+
+        if(row) {
+            // Total of occurences 
+            data.ct = row.ct;
+            // Part of occurence following the total of document
+            data.part = Math.round( (row.ct/data.tt)*100*1000 )/1000; 
+        } else {        
+            // Total of occurences (equal to its part)
+            data.part = data.ct = 0;  
+        }
+
+        return data;
+    });
+
+    return all;
 };

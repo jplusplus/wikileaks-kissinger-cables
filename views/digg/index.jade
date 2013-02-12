@@ -20,13 +20,13 @@ block stylesheets
         }
 
 block content
-    form.toolbox
+    form.toolbox(action="/count/ngrams.json", method="GET")#search
         .row-fluid          
             .span6        
                 h3.hint What? 
                 .hint Find the evolution of a trending topic into the documents, between 1973 and 1976.
                 .input-append.top10
-                    input(type="text",name="terms", placeholder="Comma-separated words: Watergate, Nixon, etc").span11
+                    input(type="text",name="q", placeholder="Comma-separated words: Watergate, Nixon, etc").span11
                     button(tye="submit").btn Search            
             .span5.hidden-phone.need-inspiration                          
                 h3.hint Need inspiration?
@@ -58,5 +58,6 @@ block content
 
 
 block scripts
+    script(src="/javascripts/vendor/underscore-min.js", type="text/javascript")
     script(src="/javascripts/vendor/d3.v3.min.js", type="text/javascript")
     script(src="/javascripts/digg.js", type="text/javascript")

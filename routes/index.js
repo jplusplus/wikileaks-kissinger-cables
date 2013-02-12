@@ -99,9 +99,11 @@ var dataFile = module.exports.dataFile = function (req, res) {
             return data.getNgramByWeek(req.query.q, function(err, result) {                
                 if(err) {
                     res.json({"error": err});
-                } else {                    
-                    for(var r in result) {
-                        result[r] = result[r].rows;
+                } else {             
+                    // Keep only the rows from the query                           
+                    for(var r in result) {                        
+                        // Transposes rows to week's docs count 
+                        result[r] = data.transposeToWeekCount(result[r].rows);
                     }
                     // Return the data in JSON
                     res.json(result);
