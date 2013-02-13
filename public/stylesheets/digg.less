@@ -12,3 +12,31 @@
         padding:10px;
     }
 }
+
+/* Graph */
+.axis {
+    
+    text {
+        fill:#555555;
+    }
+
+    path, .tick line {
+        fill: none;
+        stroke: @linkColor;
+        stroke-width:3px;
+        shape-rendering: crispEdges;
+        display:none;
+    }
+}
+
+.ruler line {        
+    shape-rendering: crispEdges;
+    stroke:fade(@linkColor, 10);   
+    stroke-width:1px;                   
+}
+
+.line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 1.5px;  
+}

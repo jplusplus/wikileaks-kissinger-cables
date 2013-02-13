@@ -1,24 +1,5 @@
 extends ../layout
 
-block stylesheets
-    style 
-        .axis path,
-        .axis line {
-          fill: none;
-          stroke: #000;
-          shape-rendering: crispEdges;
-        }
-
-        .x.axis path {
-          display: none;
-        }
-
-        .line {
-          fill: none;
-          stroke: steelblue;
-          stroke-width: 1.5px;
-        }
-
 block content
     form.toolbox(action="/count/ngrams.json", method="GET")#search
         .row-fluid          
@@ -60,4 +41,4 @@ block content
 block scripts
     script(src="/javascripts/vendor/underscore-min.js", type="text/javascript")
     script(src="/javascripts/vendor/d3.v3.min.js", type="text/javascript")
-    script(src="/javascripts/digg.js", type="text/javascript")
+    script(src="/javascripts/dive.js", type="text/javascript")

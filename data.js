@@ -14,6 +14,8 @@ module.exports = function() {
     module.exports.citiesByMonth    = require("./public/data/cities_by_month.json");
     module.exports.countries        = require("./public/data/countries.json");
     module.exports.docCountByWeek   = require("./public/data/doc_count_by_week.json");
+    module.exports.events           = require("./public/data/events.json");
+    
     // Doc count must be date-formated
     module.exports.docCountByWeek   = _.map(module.exports.docCountByWeek, function(c) {
         c.dt = new Date( (c.dt)*1000);
@@ -201,7 +203,7 @@ var getNgramByWeek = module.exports.getNgramByWeek = function(query, callback) {
             return function(callback) {
                 
                 var q = [];
-                q.push("SELECT to_char(\"Weeks\",'YYYYMMDD') as dt, nb as ct");
+                q.push("SELECT to_char(created_at,'YYYYMMDD') as dt, count as ct");
                 q.push("FROM cable_ngram_weeks");
                 q.push("WHERE ngram = $1");
 

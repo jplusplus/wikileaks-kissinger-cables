@@ -10,7 +10,7 @@ module.exports = function(app) {
 
     // Mains routers
     app.get("/play", playTheHistory);
-    app.get("/digg", diggIntoArchive);
+    app.get("/dive", diggIntoArchive);
 
     // Contextual routers
     app.get("/play/sidebar", playTheHistorySidebar);
@@ -37,12 +37,12 @@ var playTheHistory =  module.exports.playTheHistory = function(req, res) {
 }
 
 /**
- * Digg Into Archive page
+ * Dive Into Archive page
  * @param  {Object} req User request
  * @param  {Object} res Server result
  */
 var diggIntoArchive =  module.exports.diggIntoArchive = function (req, res) {
-    res.render("digg", {title: "Digg into archive"});
+    res.render("dive", {title: "Dive into the archive"});
 }
 
 /**
@@ -89,12 +89,12 @@ var dataFile = module.exports.dataFile = function (req, res) {
     
     // Get the data according the resource name
     switch(req.params.resource) {
-        case "countries":
-            json = data.countriesByMonth;            
+        
+        case "events":
+            // Return the data in JSON
+            return res.json(data.events);       
             break;
-        case "cities":
-            json = data.citiesByMonth;            
-            break;
+
         case "ngrams":
             return data.getNgramByWeek(req.query.q, function(err, result) {                
                 if(err) {
@@ -110,6 +110,15 @@ var dataFile = module.exports.dataFile = function (req, res) {
                 }
             });          
             break;
+
+        case "countries":
+            json = data.countriesByMonth;            
+            break;
+
+        case "cities":
+            json = data.citiesByMonth;            
+            break;
+
     }
 
     // Filter data from static files    

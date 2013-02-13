@@ -1,0 +1,42 @@
+[
+    {
+          "name": "Watergate scandal"
+        , "type": "politic"
+        , "countries" : ["US"]
+        , "start_date": "1972"
+        , "end_date": "1974"        
+        , "url": "https://en.wikipedia.org/wiki/Watergate_scandal"
+    },
+    {
+          "name":"1973 oil crisis"
+        , "type":"economic"
+        , "countries" : ["WORLD"]
+        , "start_date":"1973"
+        , "end_date":"1974"        
+        , "url": "https://en.wikipedia.org/wiki/1973_oil_crisis"
+    },
+    {
+          "name":"Vietnam War"
+        , "type":"politic"
+        , "countries" : ["VT","US"]
+        , "start_date":"1955"
+        , "end_date":"1975"        
+        , "url": "https://en.wikipedia.org/wiki/Vietnam_War"
+    },
+    {
+          "name":"Angolan Civil War"
+        , "type":"politic"
+        , "countries" : ["AO"]
+        , "start_date":"1975"
+        , "end_date":"2002"        
+        , "url": "https://en.wikipedia.org/wiki/Angolan_Civil_War"
+    },
+    {
+          "name":""
+        , "type":""
+        , "countries" : []
+        , "start_date":""
+        , "end_date":""        
+        , "url": ""
+    }
+]
