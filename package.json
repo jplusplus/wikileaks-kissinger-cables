@@ -14,6 +14,7 @@
     "freebase": "2.1.0",
     "pg": "0.12.3",
     "async": "latest",
-    "config": "latest"
+    "config": "latest",
+    "csv": "latest"
   }
 }

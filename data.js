@@ -4,18 +4,38 @@ var    _ = require("underscore"),
       pg = require("pg"),
    async = require("async"),
 freebase = require("freebase"),
-  config = require("config");
+  config = require("config"),
+     csv = require("csv");
 
 
 module.exports = function() { 
 
+    var dataDir = "./public/data/";
+
     // Get data from JSON files
-    module.exports.countriesByMonth = require("./public/data/countries_by_month.json");
-    module.exports.citiesByMonth    = require("./public/data/cities_by_month.json");
-    module.exports.countries        = require("./public/data/countries.json");
-    module.exports.docCountByWeek   = require("./public/data/doc_count_by_week.json");
-    module.exports.events           = require("./public/data/events.json");
+    module.exports.countries        = require(dataDir + "countries.json");
+    module.exports.docCountByWeek   = require(dataDir + "doc_count_by_week.json");
+    module.exports.events           = require(dataDir + "events.json");
+
+    // Get data from CSV file
     
+    csv()
+        .from(dataDir + "countries_by_month.csv", { columns: ["dt","ct", "lc", "lt", "lg"] })
+        .transform(dateStringToTimestamp)
+        .to.array(function(data) {
+            module.exports.countriesByMonth = data;
+            console.log("%d countries extracted from file.", data.length)
+        });
+
+    csv()
+        .from(dataDir + "cities_by_month.csv", { columns: ["dt","ct", "lc", "lt", "lg", "cy"] })
+        .transform(dateStringToTimestamp)
+        .to.array(function(data) {
+            module.exports.citiesByMonth = data;
+            console.log("%d cities extracted from file.", data.length)
+        });
+
+
     // Doc count must be date-formated
     module.exports.docCountByWeek   = _.map(module.exports.docCountByWeek, function(c) {
         c.dt = new Date( (c.dt)*1000);
@@ -51,6 +71,12 @@ module.exports = function() {
 
     return module.exports;
 };
+
+var dateStringToTimestamp = function(row, index) {
+    row.dt = new Date(row.dt).getTime()/1000;
+    if(index == 0) console.log(row)
+    return row;
+}
 
 
 /**

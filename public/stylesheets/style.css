@@ -1124,6 +1124,8 @@ input.ui-editRangeSlider-inputValue{width:3em;vertical-align:middle;text-align:c
 .axis path,.axis .tick line{fill:none;stroke:#3e6284;stroke-width:3px;shape-rendering:crispEdges;display:none;}
 .ruler line{shape-rendering:crispEdges;stroke:rgba(62, 98, 132, 0.1);stroke-width:1px;}
 .line{fill:none;stroke:steelblue;stroke-width:1.5px;}
+.overlay{fill:none;pointer-events:all;}
+.focus line{shape-rendering:crispEdges;stroke:#3e6284;stroke-width:1px;}
 a:hover{text-decoration:none;}
 #workspace{margin:20px 20px;}
 .toolbox{overflow:hidden;border-bottom:1px solid #d7d7d7;padding:20px;background:#fafafa;margin:0;position:relative;z-index:40;-webkit-box-shadow:0 0 10px 0 rgba(0, 0, 0, 0.1);-moz-box-shadow:0 0 10px 0 rgba(0, 0, 0, 0.1);box-shadow:0 0 10px 0 rgba(0, 0, 0, 0.1);}.toolbox .hint{font-size:16px;}
