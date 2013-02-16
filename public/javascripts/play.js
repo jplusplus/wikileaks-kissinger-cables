@@ -1,6 +1,6 @@
 (function(window, jQuery, undefined) {
     "use strict"
-    var map, mapData, mapSlotSize, symbols, timer;
+    var map, mapData, mapDataKey, mapSlotSize, symbols, timer;
     var $workspace, $form, $slider, $map, $sidebar, $backToWorld;
 
     function createCountriesMap() {      
@@ -135,12 +135,7 @@
 
     function createTooltip(meta) {
         
-        if(meta.iso2) {            
-            _.each(mapData, function(data) {
-                var elem = _.findWhere(data, { lc: meta.iso2 });
-                if(elem) meta = elem;
-            })
-        };
+        meta = !meta.iso2 || _.findWhere(mapData[mapDataKey], {lc: meta.iso2});                         
 
         if(meta) {
             var city = meta.cy ? meta.lc + ", " : "",   
@@ -170,10 +165,10 @@
         if(symbols) symbols.remove();
 
         var values = $slider.dateRangeSlider("values");
-        var key = values.min.getFullYear()+""+values.min.getMonth();  
+        mapDataKey = values.min.getFullYear()+""+values.min.getMonth();  
 
         // Data we work with
-        var data = mapData[key] || [];
+        var data = mapData[mapDataKey] || [];
         if(data.length == 0) return $workspace.removeClass("loading");        
         
         // The following assetion determines the mode:
