@@ -17,7 +17,7 @@ module.exports = function(app) {
 
     // Data files
     app.get("/count/:resource.json", dataFile);
-    app.get("/events.json", dataFile);
+    app.get("/events.json", function() { res.json(data.events) });
 
     // Right region file according a country code
     app.get("/region/:country.svg", goToRegionfile)
@@ -116,9 +116,9 @@ var dataFile = module.exports.dataFile = function (req, res) {
             break;
 
         default:
-            // Return the data in JSON
-            return res.json(data.events);   
+            return res.send(404);
             break;
+
     }
 
     // Filter data from static files    
@@ -163,16 +163,17 @@ var dataFile = module.exports.dataFile = function (req, res) {
         });
     }
 
+    var slotSize = req.query.slotSize || 1;
     // Aggregate the data
-    json = data.aggregateDocsByLocation(json);    
+    json = data.aggregateDocs(json, slotSize, req.params.resource);    
 
     // Expend location label
-    json = _.map(json, function(d) {
+    /*json = _.map(json, function(d) {
         // Looks for the country
         var country = _.findWhere(data.countries, {iso_alph2_1970: d.cy || d.lc} );
         d.label = country ? country.name : "";
         return d;
-    });
+    }); */
 
     // Return the data in JSON
     res.json(json);

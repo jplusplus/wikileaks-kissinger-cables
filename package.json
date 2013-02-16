@@ -15,6 +15,7 @@
     "pg": "0.12.3",
     "async": "latest",
     "config": "latest",
-    "csv": "latest"
+    "csv": "latest",
+    "memory-cache":"latest"
   }
 }

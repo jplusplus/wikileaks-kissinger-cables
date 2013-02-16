@@ -1,6 +1,6 @@
 (function(window, jQuery, undefined) {
     "use strict"
-    var map, mapData, symbols, timer;
+    var map, mapData, mapSlotSize, symbols, timer;
     var $workspace, $form, $slider, $map, $sidebar, $backToWorld;
 
     function createCountriesMap() {      
@@ -9,12 +9,14 @@
         $sidebar.addClass("hide");
         // Hides back button
         $backToWorld.addClass("hide");
+        // Remove slot size to force data reload
+        mapSlotSize = -1;
 
         map.loadMap('/data/wor.svg', function(m) {                          
             // Resize the map to fit corectly to its parent
             resizeMap();  
-            // Set the map style/layers
-            defaultMapLayers(m);
+            // Set the map style/layers without lands layer
+            defaultMapLayers(m, false);
             // Load the data once
             loadCountriesData();
             // Updates value using the slider
@@ -25,26 +27,24 @@
     function createRegionsMap(data, path) {    
         
         // shows back button
-        $backToWorld.removeClass("hide");
-        
+        $backToWorld.removeClass("hide");        
         // Loading mode
         $workspace.addClass("loading");
+        // Remove slot size to force data reload
+        mapSlotSize = -1;
 
-        // City selected, temporary back to the world map
-        if(data.cy) return createCountriesMap();        
-
+        // Get the country
         var country = data.iso2 || data.lc;     
-
         // Nothing to do
         if(!country) return     
 
         map.loadMap("/region/" + country + ".svg", function(m) {              
             // Resize the map to fit corectly to its parent
             resizeMap();      
-            // Set the map style/layers
-            defaultMapLayers(m);
+            // Set the map style/layers with lands layer
+            defaultMapLayers(m, true);
             // Load the data once
-            loadRegionsData(country);
+            loadRegionsData(country);            
             // Updates value using the slider
             $slider.off("valuesChanged").on("valuesChanged", function() {                
                 // Load the data passing the country
@@ -57,27 +57,45 @@
 
     function loadCountriesData() {
 
-        var slideValues = $slider.dateRangeSlider("values");
-        var params = {
-            start: slideValues.min.toISOString(), 
-            end: slideValues.max.toISOString()
-        };   
-        
-        $.getJSON("/count/countries.json", params, updateMapSymbols);
+        // Hides the sidebar
+        $sidebar.addClass("hide");
+
+        var slotSize = getSlotSize();    
+        // Did the slot size change ?
+        if(slotSize != mapSlotSize) {
+
+            mapSlotSize = slotSize;
+            var params = { slotSize: mapSlotSize };   
+            
+            $.getJSON("/count/countries.json", params, updateMapSymbols);         
+
+        // If not, just update the map
+        } else {
+            updateMapSymbols();
+        }
     }
 
     function loadRegionsData(country) {
 
-        var slideValues = $slider.dateRangeSlider("values");
-        var params = {
-            start: slideValues.min.toISOString(), 
-            end: slideValues.max.toISOString(),
-            regionFrom: country
-        };
+        // Hides the sidebar
+        $sidebar.addClass("hide");
 
-        if( ! $sidebar.hasClass("hide") ) loadCountrySidebar( $sidebar.data("country") );
+        var slotSize = getSlotSize();        
+        // Did the slot size change ?
+        if(slotSize != mapSlotSize) {
 
-        $.getJSON("/count/cities.json", params, updateMapSymbols);
+            mapSlotSize = slotSize;
+            var params = { 
+                slotSize: mapSlotSize,
+                regionFrom: country
+            };   
+            
+            $.getJSON("/count/cities.json", params, updateMapSymbols);         
+
+        // If not, just update the map
+        } else {
+            updateMapSymbols();
+        }
     }
 
     function loadCountrySidebar(place) {      
@@ -103,6 +121,16 @@
         })
     }
 
+    function getSlotSize() {
+
+        var values = $slider.dateRangeSlider("values");        
+        var months = (values.max.getFullYear() - values.min.getFullYear()) * 12;
+           months -= values.min.getMonth() + 1;
+           months += values.max.getMonth();
+
+        return (months <= 0 ? 0 : months) + 1;
+    }
+
     function createTooltip(data) {
         
         if(data.iso2) {
@@ -111,7 +139,7 @@
 
         if(data) {
             var city = data.cy ? data.lc + ", " : "",
-             matches = "<br /><small>with <strong>%d</strong> matches</small>".replace("%d", data.ct);
+             matches = "<br /><small>with <strong>%d</strong> occurences</small>".replace("%d", data.ct);
             return city + data.label + matches; 
         } else {
             return false;
@@ -131,22 +159,28 @@
          */
         
         // Records data
-        if(d) mapData = d
+        if(d) mapData = d;
+
+        var key = $slider.dateRangeSlider("values").min.getTime() / 1000;        
+        // Data we work with
+        var data = mapData[key];         
+        // Stop if no data match
+        if(!data) return;        
 
         // Removes existing symbols
         if(symbols) symbols.remove();
         
         // The following assetion determines the mode:
         // is the country in a separate field (city view) ? 
-        var isItCity = !! mapData[0].cy;
+        var isItCity = !! data[0].cy;
 
         // Use bubble mode
         if(isItCity) {
 
-            var scale = $K.scale.sqrt(mapData, 'ct').range([4, 30]);            
+            var scale = $K.scale.sqrt(data, 'ct').range([4, 30]);            
             symbols = map.addSymbols({
                 type: $K.Bubble,
-                data: mapData,
+                data: data,
                 location: function(place) {
                     return [place.lg, place.lt];
                 },
@@ -160,9 +194,8 @@
                     return fill + 'stroke: #fff; fill-opacity: 0.6;'
                 },
                 click: function(data, path) {      
+                    loadCountrySidebar(data)
                     // Stop auto-slide
-                    if(data.cy) loadCountrySidebar(data)
-                    else createRegionsMap(data)
                 },
                 tooltip: createTooltip
             });
@@ -174,12 +207,12 @@
 
             var colorscale = new chroma.ColorScale({
                 colors: ["#fafafa", "#3E6284"],
-                limits: chroma.limits(mapData, 'k-means', 10, "ct")
+                limits: chroma.limits(data, 'k-means', 10, "ct")
             });
        
             map.getLayer('countries').style({
                 fill: function(l, path) {
-                    var place = _.find(mapData, function(p) {      
+                    var place = _.find(data, function(p) {      
                         return p.lc === l.iso2;
                     });     
                     return place ? colorscale.getColor(place["ct"]) : "white"
@@ -195,20 +228,23 @@
         $workspace.removeClass("loading");
     }
 
-    function defaultMapLayers(m) {
+    function defaultMapLayers(m, widthLands) {
 
         // Checks that layers don't exist
         m.layer = m.layer || {};
 
-        m.layer['lands'] || m.addLayer('lands', {
-            name: 'lands',
-            styles: {
-                stroke: '#aaaaaa',
-                fill: '#dadada',
-                'stroke-width': 1,
-                'stroke-linejoin': 'round'
-            }
-        });    
+        if(widthLands) {            
+            m.layer['lands'] || m.addLayer('lands', {
+                name: 'lands',
+                styles: {
+                    stroke: '#aaaaaa',
+                    fill: '#dadada',
+                    'stroke-width': 1,
+                    'stroke-linejoin': 'round'
+                }
+            }); 
+        }
+
 
         m.layer['bg'] || m.addLayer('countries', {
             name: 'bg',
@@ -236,9 +272,14 @@
     }
 
     function resizeMap() {
-        // var ratio = map.viewAB.width / map.viewAB.height;
+        // var ratio = map.viewAB.width / map.viewAB.height;        
+        
         var ratio = 0.4;
         $map.height( $map.width() * ratio );
+        
+        //var height = map.viewAB.height > $map.width() * 0.4 ? $map.width() * 0.4 : map.viewAB.height;
+        //$map.height( height );
+        
         map.resize();
     }
 

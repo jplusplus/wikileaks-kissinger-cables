@@ -1037,7 +1037,7 @@ a.label:hover,a.badge:hover{color:#ffffff;text-decoration:none;cursor:pointer;}
 .ui-rangeSlider-label{color:white;margin:0 2px 2px;background-image:url('/images/label.png');background-position:bottom center;background-repeat:no-repeat;white-space:nowrap;bottom:10px;padding:3px 6px 7px;cursor:col-resize;}
 .ui-rangeSlider-label-inner{display:none;}
 input.ui-editRangeSlider-inputValue{width:3em;vertical-align:middle;text-align:center;}
-div.tagsinput{border:1px solid #CCC;background:#FFF;width:300px;height:100px;overflow:hidden;padding:5px;}div.tagsinput span.tag{font-weight:bold;-webkit-border-radius:2px;-moz-border-radius:2px;border-radius:2px;display:block;float:left;text-decoration:none;background:white;color:white;margin-right:5px;margin-bottom:5px;font-size:13px;padding:2px 5px;text-transform:uppercase;}
+div.tagsinput{border:1px solid #CCC;background:#FFF;width:300px;height:100px;overflow:hidden;padding:5px;}div.tagsinput span.tag{font-weight:bold;-webkit-border-radius:2px;-moz-border-radius:2px;border-radius:2px;display:block;float:left;text-decoration:none;background:#aaa;color:white;margin-right:5px;margin-bottom:5px;font-size:13px;padding:2px 5px;text-transform:uppercase;}
 div.tagsinput span.tag a{color:white;text-decoration:none;font-size:11px;}
 div.tagsinput input{width:80px;font-size:13px;border:1px solid transparent;background:transparent;color:#000;outline:0;margin:0 5px 5px 0;padding:2px;}
 div.tagsinput div{display:block;float:left;}

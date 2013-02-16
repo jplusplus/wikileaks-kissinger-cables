@@ -5,7 +5,8 @@ var    _ = require("underscore"),
    async = require("async"),
 freebase = require("freebase"),
   config = require("config"),
-     csv = require("csv");
+     csv = require("csv"),
+   cache = require('memory-cache');
 
 
 module.exports = function() { 
@@ -16,36 +17,34 @@ module.exports = function() {
     module.exports.docCountByWeek   = require(dataDir + "doc_count_by_week.json");
 
     // Get data from CSV files
+    csv().from(dataDir + "countries_by_month.csv", { columns: ["dt","ct", "lc", "lt", "lg"] })
+            .transform(dateStringToTimestamp)
+            .to.array(function(data) {            
+                module.exports.countriesByMonth = convertCoord(data);
+                console.log("%d countries/count extracted from file.", data.length)
+            });
 
-    csv()
-        .from(dataDir + "countries_by_month.csv", { columns: ["dt","ct", "lc", "lt", "lg"] })
-        .transform(dateStringToTimestamp)
-        .to.array(function(data) {
-            module.exports.countriesByMonth = data;
-            console.log("%d countries/count extracted from file.", data.length)
-        });
+    csv().from(dataDir + "cities_by_month.csv", { columns: ["dt","ct", "lc", "lt", "lg", "cy"] })
+            .transform(dateStringToTimestamp)
+            .to.array(function(data) {
+                data = .map(data, function(d) {
 
-    csv()
-        .from(dataDir + "cities_by_month.csv", { columns: ["dt","ct", "lc", "lt", "lg", "cy"] })
-        .transform(dateStringToTimestamp)
-        .to.array(function(data) {
-            module.exports.citiesByMonth = data;
-            console.log("%d cities/count extracted from file.", data.length)
-        });
+                });
+                module.exports.citiesByMonth = convertCoord(data);
+                console.log("%d cities/count extracted from file.", data.length)
+            });
 
-    csv()
-        .from(dataDir + "countries.csv", { columns: true })
-        .to.array(function(data) {
-            module.exports.countries = data;
-            console.log("%d countries extracted from file.", data.length)
-        });
+    csv().from(dataDir + "countries.csv", { columns: true })
+            .to.array(function(data) {
+                module.exports.countries = data;
+                console.log("%d countries extracted from file.", data.length)
+            });
 
-    csv()
-        .from(dataDir + "events.csv", { columns: true })
-        .to.array(function(data) {
-            module.exports.events = data;
-            console.log("%d events extracted from file.", data.length)
-        });
+    csv().from(dataDir + "events.csv", { columns: true })
+            .to.array(function(data) {
+                module.exports.events = data;
+                console.log("%d events extracted from file.", data.length)
+            });
 
 
     // Doc count must be date-formated
@@ -89,11 +88,74 @@ var dateStringToTimestamp = function(row, index) {
     return row;
 }
 
+/**
+ * Convert coordonate to float
+ * @param  {Array} data Dataset to convert
+ * @return {Array}      Dataset converted
+ */
+var convertCoord = function(data) {
+    return _.map(data, function(d) {
+        d.lt = 1*d.lt;
+        d.lg = 1*d.lg;
+        return d;
+    })
+};
+
+/**
+ * Aggregates every given documents by slot size them by location key 
+ * @param  {Array}      docs        Documents list
+ * @params {Integer}    slotSize    Month number to group by  
+ * @params {String}     doctype     Documents type (to use the cache)
+ * @return {Array}                  Documents aggregated
+ */
+var aggregateDocs = module.exports.aggregateDocs = function(docs, slotSize, doctype) {
+
+    var d = {};
+    // Look at the cache first
+    if(doctype) {
+        var cacheKey = doctype+"-count-"+slotSize;
+        // Get the data from the cache
+        d = cache.get(cacheKey);
+        // Cache value exists !
+        if(d != null) return d;        
+        // Reset d        
+        else d = {};
+    }
+
+    // Get all different months
+    // using the date attribute
+    // and sort them.
+    var months = _.uniq( _.pluck(docs, "dt") ).sort(function(a,b){ return a-b; }),
+      monthLen = months.length;
+    
+    _.each(months, function(m, idx) {
+        // Remove the time in the key
+        m = new Date(m*1000);
+        m = new Date(m.getYear(), m.getMonth(), m.getDate() ).getTime() / 1000;
+        // For each month, merge data along the slot site
+        if(idx < monthLen - slotSize -1) {
+            d[m] = [];
+            for(var j=0; j<slotSize; j++ ) {
+                d[m] = d[m].concat( _.where(docs, {dt: months[idx+j]}) );
+            }
+        }
+        // Aggreagte by the location the final dataset
+        d[m] = aggregateDocsByLocation(d[m]);  
+        // Remove the date (already in the key)
+        d[m] = _.map(d[m], function(e) { delete e.dt; return e;  })  
+    });
+
+    // Puts data into the cache
+    if(cacheKey) cache.put(cacheKey, d);
+
+    return d;
+
+};
 
 /**
  * Aggregates every given documents by location key
- * @param  {Array} docs Documents list
- * @return {Array}      Documents aggregated
+ * @param  {Array}      docs        Documents list
+ * @return {Array}                  Documents aggregated
  */
 var aggregateDocsByLocation = module.exports.aggregateDocsByLocation = function(docs) {
 
@@ -101,7 +163,7 @@ var aggregateDocsByLocation = module.exports.aggregateDocsByLocation = function(
 
     return _.map(groupedDocs, function(docs) {
 
-        doc = docs[0];
+        doc = _.clone(docs[0]);
         doc.ct = _.reduce(docs, function(sum,n) {                                        
             return sum += 1*n.ct;
         }, 0);
