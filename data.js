@@ -135,7 +135,6 @@ var aggregateDocs = module.exports.aggregateDocs = function(docs, slotSize, doct
 
         // For each month, merge data along the slot site
         if(idx <= monthLen - slotSize + 1) {
-            console.log(m);
             d[m] = [];
             for(var j=0; j<=slotSize; j++ ) {                
                 d[m] = d[m].concat( _.where(docs, {dt: months[idx+j] }) );
