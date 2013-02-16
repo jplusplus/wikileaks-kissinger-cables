@@ -6,6 +6,7 @@
     var $tip = $(".tip"),
        graph = "#graph",
       $graph = $(graph),
+     $search = $("#search"),
       $types = $(".select-events-type")
 
     // Global data object and events 
@@ -168,7 +169,7 @@
         }
 
         // Colorize input tags
-        $("#search .tagsinput .tag").each(function(i) {
+        $search.find(".tagsinput .tag").each(function(i) {
             var val = $(this).find("span").text().toUpperCase().trim();
             $(this).css("background-color", color( val ) );
         });
@@ -299,7 +300,7 @@
     function launchSearch() {
         
         // Get the query to look for
-        var q = $(this).val() || $(this).find(":input[name=q]").val();        
+        var q = $(this).val() || $search.find(":input[name=q]").val();        
 
         if(q != undefined) d3.json("/count/ngrams.json?q="+q, drawGraph);
 
@@ -415,17 +416,20 @@
             // Events type toggle
             $types.delegate(".type", "click", toggleEvent);
 
+            // Launch the search once
+            launchSearch();
 
             // Tags system
-            $("#search [name=q]").tagsInput({
+            $search.find("[name=q]").tagsInput({
                 height:'25px',
                 width:'80%',
                 defaultText:'add a term',
-                onChange:  launchSearch
+                onAddTag:  launchSearch,
+                onRemoveTag:  launchSearch
             });
 
             // Search form events
-            $("#search").submit(function(ev) {
+            $search.on("submit", function(ev) {
                 ev.preventDefault();
                 launchSearch();
             });

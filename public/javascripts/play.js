@@ -168,7 +168,7 @@
 
         var values = $slider.dateRangeSlider("values");
         var key = values.min.getFullYear()+""+values.min.getMonth();  
-        
+
         // Data we work with
         var data = mapData[key] || [];
         if(data.length == 0) return $workspace.removeClass("loading");        
@@ -209,6 +209,7 @@
        
             map.getLayer('countries').style({
                 fill: function(l, path) {
+
                     var place = _.find(data, function(p) {      
                         return p.lc === l.iso2;
                     });     
@@ -242,16 +243,6 @@
             }); 
         }
 
-
-        m.layer['bg'] || m.addLayer('countries', {
-            name: 'bg',
-            styles: {
-                fill: '#f4f4f4',
-                stroke: '#f4f4f4',
-                'stroke-width': 10,
-                'stroke-linejoin': 'round'
-            }
-        });
 
          m.layer['countries'] || m.addLayer('countries', {
             name: 'countries',

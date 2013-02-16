@@ -17,7 +17,7 @@ module.exports = function(app) {
 
     // Data files
     app.get("/count/:resource.json", dataFile);
-    app.get("/events.json", function() { res.json(data.events) });
+    app.get("/events.json", function(req, res) { res.json(data.events) });
 
     // Right region file according a country code
     app.get("/region/:country.svg", goToRegionfile)
