@@ -27,9 +27,6 @@ module.exports = function() {
     csv().from(dataDir + "cities_by_month.csv", { columns: ["dt","ct", "lc", "lt", "lg", "cy"] })
             .transform(dateStringToTimestamp)
             .to.array(function(data) {
-                data = .map(data, function(d) {
-
-                });
                 module.exports.citiesByMonth = convertCoord(data);
                 console.log("%d cities/count extracted from file.", data.length)
             });
@@ -142,7 +139,7 @@ var aggregateDocs = module.exports.aggregateDocs = function(docs, slotSize, doct
         // Aggreagte by the location the final dataset
         d[m] = aggregateDocsByLocation(d[m]);  
         // Remove the date (already in the key)
-        d[m] = _.map(d[m], function(e) { delete e.dt; return e;  })  
+        d[m] = _.map(d[m], function(e) { delete e.dt; return e;  });        
     });
 
     // Puts data into the cache

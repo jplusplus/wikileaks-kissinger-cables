@@ -121,57 +121,38 @@ var dataFile = module.exports.dataFile = function (req, res) {
 
     }
 
-    // Filter data from static files    
-    // ...by start date
-    if(req.query.start) {
-        var start = ( Date.parse(req.query.start)-60 )/1000; // Fix UTC swift               
-        var tmpJson = []
-        // Fetch the json to find the right document
-        for(var i in json) {            
-            // The current document is valid
-            if(json[i].dt >= start) tmpJson.push(json[i]);
-            // The list is ordered by date, so we can't stop if we have any document
-            else if( !! tmpJson.length ) break; 
-        }
-        json = tmpJson;
-    }
-
-    // ...by end date
-    if(req.query.end) {
-        var end = ( Date.parse(req.query.end)-60 )/1000; // Fix UTC swift
-        var tmpJson = []
-        // Fetch the json to find the right document
-        for(var i in json) {            
-            // The current document is valid
-            if(json[i].dt < end) tmpJson.push(json[i]);
-            // The list is ordered by date, so we can't stop if we have any document
-            else if( !! tmpJson.length ) break; 
-        }
-        json = tmpJson;
-    }
-
-    // Filter the data    
-    // ...by region
-    if(req.query.regionFrom) {
-        
-        // Find the region matching to the given place
-        var region = data.getRegionFromPlace(req.query.regionFrom);
-
-        // Filters using this region
-        json = _.filter(json, function(l) {
-            return data.isInRegionFile(l.cy, region);
-        });
-    }
 
     var slotSize = req.query.slotSize || 1;
     // Aggregate the data
-    json = data.aggregateDocs(json, slotSize, req.params.resource);    
+    json = data.aggregateDocs(json, slotSize, req.params.resource); 
+
+
+    if(req.query.regionFrom) {      
+        // Find the region matching to the given place
+        var region = data.getRegionFromPlace(req.query.regionFrom);
+    }
+
+    // Map the json    
+    _.each(json, function(d, idx) {
+
+        // Filters using this region
+        if(region) {                    
+            json[idx] = _.filter(d, function(l) {
+                return data.isInRegionFile(l.cy, region);
+            });
+        }
+        
+        // Looks for the country
+        json[idx] =_.map(json[idx], function(l) {            
+            var country = _.findWhere(data.countries, {iso_alph2_1970: l.cy || l.lc} );
+            l.label = country ? country.name : "";        
+            return l;
+        })         
+
+    });
 
     // Expend location label
     /*json = _.map(json, function(d) {
-        // Looks for the country
-        var country = _.findWhere(data.countries, {iso_alph2_1970: d.cy || d.lc} );
-        d.label = country ? country.name : "";
         return d;
     }); */
 
