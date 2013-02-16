@@ -99,7 +99,6 @@
     }
 
     function loadCountrySidebar(place) {      
-
         var country = place.cy || place.lc || place;        
         var slideValues = $slider.dateRangeSlider("values");        
         // Creates the parameters object 
@@ -108,6 +107,9 @@
             endYear   : slideValues.max.getFullYear(),
             country   : country
         };
+        
+        // Stop auto-slide
+        timer.stop();
 
         // Save the country related to the sidebar
         $sidebar.data("country", country)
@@ -161,21 +163,19 @@
         // Records data
         if(d) mapData = d;
 
-        var key = $slider.dateRangeSlider("values").min.getTime() / 1000;        
-        // Data we work with
-        var data = mapData[key];         
-        // Stop if no data match
-        if(!data) return;        
-
         // Removes existing symbols
         if(symbols) symbols.remove();
+
+        var values = $slider.dateRangeSlider("values");
+        var key = values.min.getFullYear()+""+values.min.getMonth();  
+        
+        // Data we work with
+        var data = mapData[key] || [];
+        if(data.length == 0) return $workspace.removeClass("loading");        
         
         // The following assetion determines the mode:
-        // is the country in a separate field (city view) ? 
-        var isItCity = !! data[0].cy;
-
-        // Use bubble mode
-        if(isItCity) {
+        // is the country in a separate field (city view) ?         
+        if(!! data[0].cy) {
 
             var scale = $K.scale.sqrt(data, 'ct').range([4, 30]);            
             symbols = map.addSymbols({
@@ -193,10 +193,7 @@
                     var fill = place.cy ? "fill:#B4131D;" : "fill:#3E6284;";
                     return fill + 'stroke: #fff; fill-opacity: 0.6;'
                 },
-                click: function(data, path) {      
-                    loadCountrySidebar(data)
-                    // Stop auto-slide
-                },
+                click: loadCountrySidebar,
                 tooltip: createTooltip
             });
 

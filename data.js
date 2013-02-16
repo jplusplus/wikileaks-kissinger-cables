@@ -122,25 +122,40 @@ var aggregateDocs = module.exports.aggregateDocs = function(docs, slotSize, doct
     // Get all different months
     // using the date attribute
     // and sort them.
-    var months = _.uniq( _.pluck(docs, "dt") ).sort(function(a,b){ return a-b; }),
+    var months = _.uniq( 
+                    _.pluck(
+                        module.exports.countriesByMonth, "dt")
+                    ).sort(function(a,b){ return a-b; }),
       monthLen = months.length;
     
     _.each(months, function(m, idx) {
         // Remove the time in the key
         m = new Date(m*1000);
-        m = new Date(m.getYear(), m.getMonth(), m.getDate() ).getTime() / 1000;
+        m = m.getFullYear() +""+ m.getMonth();
+
         // For each month, merge data along the slot site
-        if(idx < monthLen - slotSize -1) {
+        if(idx <= monthLen - slotSize + 1) {
+            console.log(m);
             d[m] = [];
-            for(var j=0; j<slotSize; j++ ) {
-                d[m] = d[m].concat( _.where(docs, {dt: months[idx+j]}) );
+            for(var j=0; j<=slotSize; j++ ) {                
+                d[m] = d[m].concat( _.where(docs, {dt: months[idx+j] }) );
             }
         }
         // Aggreagte by the location the final dataset
         d[m] = aggregateDocsByLocation(d[m]);  
-        // Remove the date (already in the key)
-        d[m] = _.map(d[m], function(e) { delete e.dt; return e;  });        
+        d[m] = _.map(d[m], function(e) {    
+            // Looks for the country
+            var country = _.findWhere(module.exports.countries, {
+                iso_alph2_1970: e.cy || e.lc
+            });
+            e.label = country ? country.name : "";  
+            // Remove the date (already in the key)
+            delete e.dt;
+
+            return e; 
+        });    
     });
+
 
     // Puts data into the cache
     if(cacheKey) cache.put(cacheKey, d);

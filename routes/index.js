@@ -86,10 +86,12 @@ var playTheHistorySidebar =  module.exports.playTheHistorySidebar = function(req
  * @param  {Object} res Server result
  */
 var dataFile = module.exports.dataFile = function (req, res) {
-    var json = [];
+    
+    var json = [],
+    resource = req.params.resource;
     
     // Get the data according the resource name
-    switch(req.params.resource) {
+    switch(resource) {
         
         case "ngrams":
             return data.getNgramByWeek(req.query.q, function(err, result) {                
@@ -121,40 +123,24 @@ var dataFile = module.exports.dataFile = function (req, res) {
 
     }
 
-
+    // Determines how many month are grouped by backet
     var slotSize = req.query.slotSize || 1;
-    // Aggregate the data
-    json = data.aggregateDocs(json, slotSize, req.params.resource); 
 
-
-    if(req.query.regionFrom) {      
+    if(req.query.regionFrom) {            
         // Find the region matching to the given place
-        var region = data.getRegionFromPlace(req.query.regionFrom);
-    }
-
-    // Map the json    
-    _.each(json, function(d, idx) {
-
+        var region = data.getRegionFromPlace(req.query.regionFrom);    
         // Filters using this region
         if(region) {                    
-            json[idx] = _.filter(d, function(l) {
+            json = _.filter(json, function(l) {
                 return data.isInRegionFile(l.cy, region);
             });
         }
-        
-        // Looks for the country
-        json[idx] =_.map(json[idx], function(l) {            
-            var country = _.findWhere(data.countries, {iso_alph2_1970: l.cy || l.lc} );
-            l.label = country ? country.name : "";        
-            return l;
-        })         
+        // Append the region to the resource name (for cache key)
+        resource += "-" + region;   
+    }
 
-    });
-
-    // Expend location label
-    /*json = _.map(json, function(d) {
-        return d;
-    }); */
+    // Aggregate the data
+    json = data.aggregateDocs(json, slotSize, resource);                     
 
     // Return the data in JSON
     res.json(json);
