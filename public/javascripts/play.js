@@ -26,6 +26,8 @@
 
     function createRegionsMap(data, path) {    
         
+        // Remove existing qtips
+        $(".qtip").remove();
         // shows back button
         $backToWorld.removeClass("hide");        
         // Loading mode
@@ -135,7 +137,9 @@
 
     function createTooltip(meta) {
         
-        meta = !meta.iso2 || _.findWhere(mapData[mapDataKey], {lc: meta.iso2});                         
+        if(meta.iso2) {
+            meta = _.findWhere(mapData[mapDataKey], {lc: meta.iso2});                         
+        }
 
         if(meta) {
             var city = meta.cy ? meta.lc + ", " : "",   
@@ -162,7 +166,7 @@
         if(d) mapData = d;
 
         // Removes existing symbols
-        if(symbols) symbols.remove();
+        if(symbols) symbols.remove();        
 
         var values = $slider.dateRangeSlider("values");
         mapDataKey = values.min.getFullYear()+""+values.min.getMonth();  
