@@ -13,18 +13,16 @@ module.exports = function() {
     var dataDir = "./public/data/";
 
     // Get data from JSON files
-    module.exports.countries        = require(dataDir + "countries.json");
     module.exports.docCountByWeek   = require(dataDir + "doc_count_by_week.json");
-    module.exports.events           = require(dataDir + "events.json");
 
-    // Get data from CSV file
-    
+    // Get data from CSV files
+
     csv()
         .from(dataDir + "countries_by_month.csv", { columns: ["dt","ct", "lc", "lt", "lg"] })
         .transform(dateStringToTimestamp)
         .to.array(function(data) {
             module.exports.countriesByMonth = data;
-            console.log("%d countries extracted from file.", data.length)
+            console.log("%d countries/count extracted from file.", data.length)
         });
 
     csv()
@@ -32,7 +30,21 @@ module.exports = function() {
         .transform(dateStringToTimestamp)
         .to.array(function(data) {
             module.exports.citiesByMonth = data;
-            console.log("%d cities extracted from file.", data.length)
+            console.log("%d cities/count extracted from file.", data.length)
+        });
+
+    csv()
+        .from(dataDir + "countries.csv", { columns: true })
+        .to.array(function(data) {
+            module.exports.countries = data;
+            console.log("%d countries extracted from file.", data.length)
+        });
+
+    csv()
+        .from(dataDir + "events.csv", { columns: true })
+        .to.array(function(data) {
+            module.exports.events = data;
+            console.log("%d events extracted from file.", data.length)
         });
 
 
@@ -74,7 +86,6 @@ module.exports = function() {
 
 var dateStringToTimestamp = function(row, index) {
     row.dt = new Date(row.dt).getTime()/1000;
-    if(index == 0) console.log(row)
     return row;
 }
 
@@ -112,18 +123,16 @@ var extractCountriesFromRegion = module.exports.extractCountriesFromRegion = fun
     var dir = './public/data/';
     // Files to fetch 
     // ORDER IS IMPORTANT: it defines priority when a country is in 2 regions
-    var regionFiles = [        
-        "region-mo.svg",
-        "region-na.svg",
-        "region-ca.svg",
-        "region-euw.svg",
-        "region-eun.svg",
-        "region-eus.svg",
-        "region-eue.svg",
-        "region-sa.svg",
-        "region-oc.svg",
-        "region-af.svg",
-        "region-as.svg"
+    var regionFiles = [ 
+        "afr.svg",
+        "amc.svg",
+        "amn.svg",
+        "ams.svg",
+        "asi.svg",
+        "eue.svg",
+        "euo.svg",
+        "moo.svg",
+        "su.svg"
     ];                
 
     // Object to recolt the regions' countries
@@ -220,25 +229,28 @@ var getNgramByWeek = module.exports.getNgramByWeek = function(query, callback) {
     // Terms to look for
           terms = query.split(","); 
     // Query maximum number
-    var limit = 3;
+    var limit = 6;
 
     for( var t in terms )  {    
         var term = terms[t].trim();
-        // Create a closure function
-        queries[term] = function(term)  { 
-            return function(callback) {
-                
-                var q = [];
-                q.push("SELECT to_char(created_at,'YYYYMMDD') as dt, count as ct");
-                q.push("FROM cable_ngram_weeks");
-                q.push("WHERE ngram = $1");
+        // Avoid looking for an empty string
+        if(term !== "") {                
+            // Create a closure function
+            queries[term] = function(term)  { 
+                return function(callback) {
+                    
+                    var q = [];
+                    q.push("SELECT to_char(created_at,'YYYYMMDD') as dt, count as ct");
+                    q.push("FROM cable_ngram_weeks");
+                    q.push("WHERE ngram = $1");
 
-                dbClient.query(q.join(" "), [term], callback); 
-            }
-        }(term);
+                    dbClient.query(q.join(" "), [term], callback); 
+                }
+            }(term);
 
-        // Check and update the number of queries left
-        if(--limit == 0) break;    
+            // Check and update the number of queries left
+            if(--limit == 0) break;  
+        }  
     }
 
     // Send all queries at the same time (maximum 3)

@@ -1,16 +1,77 @@
+
 #trends {
     
     padding:0;
     width:auto;
-    min-height:600px;
+    min-height:100px;
     position:relative;
     z-index:60;    
     overflow:hidden;
     
-    .tools {
-        margin-top:30px;
-        padding:10px;
+    .select-events-type {  
+
+        border:1px solid @toolboxBorder;   
+        background:darken(@toolboxColor, 1%);
+        .box-shadow(0 0 10px 0 fade(black, 10%));        
+        padding:10px 10px;
+        margin:30px 40px;
+
+        position:absolute;
+        top:0;        
+                
+        .type {            
+            margin-right:10px;
+            font-size:1em;
+            padding:3px 6px;
+            cursor:pointer;
+            .opacity(40);
+            
+            &.active {
+                .opacity(100);
+            }
+
+            &:first-letter {
+                text-transform:uppercase;
+            }
+        }
     }
+}
+
+.tip {
+    position:absolute;
+    top:0;
+    left:0;
+    z-index:100;
+    
+    max-width:300px;
+    margin:0 30px;
+
+    background:white;
+    padding:20px;
+    .box-shadow(0 0 2px 0 fade(black, 10%) );    
+    border:1px solid @toolboxBorder;
+    
+    &:before {
+        content:"";
+        position:absolute;
+        left:-1px;
+        top:50%;
+        margin:-10px;
+        height:20px;
+        width:20px;
+        background:white;
+        border:1px solid @toolboxBorder;
+        border-top:0;
+        border-right:0;
+        .rotate(45deg);
+        .box-shadow(-1px 1px  1px 0 fade(black, 5%) );  
+                
+    }
+
+    &.right:before {
+        .rotate(225deg);
+        left:auto; right:-1px;            
+    }          
 }
 
 /* Graph */
@@ -25,7 +86,7 @@
         stroke: @linkColor;
         stroke-width:3px;
         shape-rendering: crispEdges;
-        display:none;
+        display:none;        
     }
 }
 
@@ -50,4 +111,14 @@
     shape-rendering: crispEdges;
     stroke:@linkColor;   
     stroke-width:1px;    
+}
+
+
+.events {
+
+    text {
+        fill:black;
+        font-weight:bold;
+        .opacity(70);
+    }
 }

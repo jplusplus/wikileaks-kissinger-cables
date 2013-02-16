@@ -5,19 +5,25 @@
     // -------------------------------------------------------------------------
     var $tip = $(".tip"),
        graph = "#graph",
-      $graph = $(graph); 
+      $graph = $(graph),
+      $types = $(".select-events-type")
 
-    // Global data object
-    var  data = {},
+    // Global data object and events 
+    var  data = {}, events = [],
     // Visualization
           svg = null,
     // Indicator attrbute
     indicator = "part",
     // Graph sizes
     sizes = {
-        margin : {top: 60, right: 40, bottom: 30, left: 40},
+        margin : {top: 40, right: 40, bottom: 0, left: 40},
+        graphHeight : 250,
         width  : 0,
-        height : 0
+        height : 0,
+        eventsY : 0,
+        eventHeight : 15,
+        eventMargin : 5,
+        eventFontSize : "0.85em"
     };
     // -------------------------------------------------------------------------
 
@@ -55,7 +61,7 @@
      * @type    {Function}
      * @return  {String}
      */
-    var color = d3.scale.category10();
+    var color = d3.scale.category20b();
 
     /**
      * Parse the date with the given format
@@ -93,7 +99,7 @@
         // Create a new one in the graph space
         return d3.select(graph).append("svg")
             .attr("width", sizes.width + sizes.margin.left + sizes.margin.right)
-            .attr("height", sizes.height + sizes.margin.top + sizes.margin.bottom)
+            .attr("height", sizes.height)
             .append("g")
                 .attr("transform", "translate(" + sizes.margin.left + "," + sizes.margin.top + ")");
     }
@@ -106,16 +112,21 @@
     function adjustSizes(redraw) {
         
         // Calculates the graph sizes
-        sizes.width  = $graph.innerWidth() - sizes.margin.left - sizes.margin.right,
-        sizes.height = 450 - sizes.margin.top - sizes.margin.bottom;
+        sizes.tolalEventsHeight = (sizes.eventHeight+sizes.eventMargin) * events.length                
+        sizes.height  = sizes.graphHeight + sizes.tolalEventsHeight;
+        sizes.height += sizes.margin.top + sizes.margin.bottom;
+        sizes.height += $types.outerHeight(true);
+        sizes.width   = $graph.innerWidth() - sizes.margin.left - sizes.margin.right;
+        sizes.eventsY = sizes.graphHeight + sizes.margin.bottom + $types.outerHeight(true)
 
-        if(redraw === true) {
+        // Redraw by default (if no parameter)
+        if(redraw !== false) {
             // Update the axis ranges
             adjustRanges();
             // Create a new SVG (with the new size)
             svg = getNewSvg();
             // Update the visualization
-            createGraph();
+            drawGraph();
         }
 
         return sizes;
@@ -127,12 +138,8 @@
      */
     function adjustRanges() {
         x.range([0, sizes.width]);
-        y.range([sizes.height, 0]);   
+        y.range([sizes.graphHeight, 0]);   
         return sizes;     
-    }
-
-    function resizeGraph() {
-        adjustSizes(true);
     }
 
     /**
@@ -140,7 +147,7 @@
      * @param  {Object} error Equals null if no error
      * @param  {Object} d     (Optional) Data series
      */
-    function createGraph(error, d) {
+    function drawGraph(error, d) {
 
         // Error happens
         if(error || d&&d.error) return alert("Impossible to create the visualization!");
@@ -159,6 +166,12 @@
                 return {name: ngram, values: values};
             });
         }
+
+        // Colorize input tags
+        $("#search .tagsinput .tag").each(function(i) {
+            var val = $(this).find("span").text().toUpperCase().trim();
+            $(this).css("background-color", color( val ) );
+        });
      
         // Use the first line to extend the X axis 
         // (both datasets are the same on X)
@@ -197,10 +210,17 @@
                 .append("g")
                     .attr("class", "ngram");
 
+
+
         ngram.append("path")
-            .attr("class", "line")
-            .attr("d", function(d) { return line(d.values); })
-            .style("stroke", function(d) {  return color(d.name); });
+            .attr("class", "line")          
+            .attr("d", function(d) { return line(d.values); })        
+            .style("stroke", function(d) {  
+                console.log(d.name)
+                return color(d.name);
+            });            
+                
+
 
         var focus = svg.selectAll(".focus")
             .data(data)
@@ -217,13 +237,17 @@
         svg.append("rect")
             .attr("class", "overlay")
             .attr("width", sizes.width)
-            .attr("height", sizes.height)
+            .attr("height", sizes.graphHeight)
             .on("mouseover", function() { focus.style("display", null); })
             .on("mouseout", function() { 
                 $tip.addClass("hidden");
                 focus.style("display", "none"); 
             })
             .on("mousemove", mousemove);
+
+        // Add events on the graph
+        drawEvents();
+
 
         /**
          * Local mousemove function to create a tooltip and and a ruler
@@ -252,6 +276,7 @@
             });
 
             var onRight = d3.event.pageX > $(window).width()/2;
+
             $tip.html( content.join("") );
             $tip.css({
                 "top": d3.event.pageY - $tip.outerHeight()/2,
@@ -271,38 +296,141 @@
      * @param  {Object|String} ev   Optional triggered event or string to search
      * @return {Boolean}            Always false to prevent IE bug
      */
-    function launchSearch(ev) {
-
-        if(typeof ev == "object") {
-            // Get the query to look for
-            var q = $(this).find(":input[name=q]").val();
-            ev && ev.preventDefault();    
-
-        } else if(typeof ev == "string") {
-            var q = ev;
-        }
+    function launchSearch() {
         
-        d3.json("/count/ngrams.json?q="+q, createGraph);
+        // Get the query to look for
+        var q = $(this).val() || $(this).find(":input[name=q]").val();        
+
+        if(q != undefined) d3.json("/count/ngrams.json?q="+q, drawGraph);
 
         return false;
     }
 
+    function loadEvents(callback) {
+
+        $.getJSON("/events.json", function(d) {
+            // Parse dates
+            events = _.map(d, function(ev) {
+                ev.start_date = new Date(ev.start_date); 
+                ev.end_date = new Date(ev.end_date); 
+                return ev;
+            });       
+
+            // Sorts by date
+            events = _.sortBy(events, function(ev) { return ev.start_date })
+            // Finds the types
+            var types = _.uniq( _.pluck(events, "type") );
+            
+            // Add the new types to the form
+            $types.html("Event's categories: ");            
+            $.each(types, function(index, type) {
+                var $label = $("<span/>").addClass("active type label").html(type);
+                $label.css("background-color", color(type) );
+                $label.data("type", type);
+                $types.append($label);
+            });
+
+            // Position the form
+            $types.css({
+                top: sizes.graphHeight + sizes.margin.bottom + sizes.margin.top                
+            });
+
+            return callback && callback(events);
+        });
+    }
+
+    function drawEvents() {
+
+        // Remove every events in the current graph
+        svg.selectAll("g.events").remove();
+        
+        // Only keep active events
+        var eventsFiltered = _.filter(events, function(ev) {            
+            return $types.find(".type.active").filter(function(idx, type) {
+                return $(type).data("type") == ev.type;
+            }).length > 0;
+        });
+
+
+        var ev = svg.append("g").attr("class", "events")                
+                    .selectAll(".events")
+                        .data(eventsFiltered)
+                        .enter()
+                        .append("g").attr("class", "event")   
+                            .attr("transform", "translate(0," + sizes.eventsY + ")")
+                            .append("a")
+                                .attr("xlink:href", function(d) {return d.url})
+                                .attr("target", "_blank");
+
+        var rect = ev.append("rect")
+                        .attr("rx",3)
+                        .style("fill", function(d) { 
+                            return color(d.type)
+                        })
+                        .attr("height", sizes.eventHeight)
+                        .attr("width", function(d) {                                
+                            return Math.max(6, x(d.end_date)-x(d.start_date) );
+                        })
+                        .attr("x", function(d) {                                
+                            return x(d.start_date);
+                        })
+                        .attr("y", function(d, index) {                                
+                            return  + index * (sizes.eventHeight+sizes.eventMargin);
+                        })
+
+        var label = ev.append("text")                        
+                        .attr("transform", function(d, index) { 
+                            
+                            var tx = Math.max(0, x(d.start_date) ),
+                                ty = index * (sizes.eventHeight+sizes.eventMargin);
+
+                            return "translate(" + tx + "," + ty + ")"; 
+                        })
+                        .text(function(d) { return d.name })
+                        .attr("x", 10)
+                        .attr("dy", sizes.eventFontSize)
+    }
+
+    function toggleEvent(e) {
+        $(this).toggleClass("active");
+        drawEvents();
+        e.preventDefault();
+    }
 
     /**
      * Graph initialization
      */
-    (function init() {        
-        // Adjust the graph sizes
-        adjustSizes();
-        adjustRanges();
-        svg = getNewSvg();
+    (function init() {     
 
-        // Search form events
-        $("#search").submit(launchSearch);
-        // Graph resizing
-        $(window).resize(resizeGraph);
         
-        launchSearch("nixon,watergate");
+        // Start with events loading
+        loadEvents(function() {   
+            // Adjust the graph sizes
+            adjustSizes(false);
+            adjustRanges();
+            svg = getNewSvg();
+
+            // Graph resizing
+            $(window).resize(adjustSizes);
+            // Events type toggle
+            $types.delegate(".type", "click", toggleEvent);
+
+
+            // Tags system
+            $("#search [name=q]").tagsInput({
+                height:'25px',
+                width:'80%',
+                defaultText:'add a term',
+                onChange:  launchSearch
+            });
+
+            // Search form events
+            $("#search").submit(function(ev) {
+                ev.preventDefault();
+                launchSearch();
+            });
+        });
+
     })();
 
 

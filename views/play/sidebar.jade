@@ -1,6 +1,9 @@
 .header
     .flag
-        img(src="/images/flags/"+country.iso+".gif",alt="country flag")
+        - if(typeof country.suppl != "undefined")
+            img(src="/images/flags/" + country.iso_alph2_1970 + "-" +  country.suppl + ".gif",alt="country flag")
+        - else
+            img(src="/images/flags/" + country.iso_alph2_1970 + ".gif",alt="country flag")
     if startYear === endYear
         h3 What happened in&nbsp;<em>#{country.name}</em><br />in&nbsp;<em>#{endYear}</em>?
     else

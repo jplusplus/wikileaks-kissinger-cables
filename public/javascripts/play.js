@@ -10,7 +10,7 @@
         // Hides back button
         $backToWorld.addClass("hide");
 
-        map.loadMap('/data/world.svg', function(m) {                          
+        map.loadMap('/data/wor.svg', function(m) {                          
             // Resize the map to fit corectly to its parent
             resizeMap();  
             // Set the map style/layers
@@ -22,7 +22,7 @@
         });
     }
 
-    function createRegionsMap(data, path) {        
+    function createRegionsMap(data, path) {    
         
         // shows back button
         $backToWorld.removeClass("hide");
@@ -80,7 +80,7 @@
         $.getJSON("/count/cities.json", params, updateMapSymbols);
     }
 
-    function loadCountrySidebar(place) {        
+    function loadCountrySidebar(place) {      
 
         var country = place.cy || place.lc || place;        
         var slideValues = $slider.dateRangeSlider("values");        
@@ -108,6 +108,7 @@
         if(data.iso2) {
             data = _.findWhere(mapData, { lc: data.iso2 });
         }
+
         if(data) {
             var city = data.cy ? data.lc + ", " : "",
              matches = "<br /><small>with <strong>%d</strong> matches</small>".replace("%d", data.ct);
@@ -142,8 +143,7 @@
         // Use bubble mode
         if(isItCity) {
 
-            var scale = $K.scale.sqrt(mapData, 'ct').range([4, 40]);
-
+            var scale = $K.scale.sqrt(mapData, 'ct').range([4, 30]);            
             symbols = map.addSymbols({
                 type: $K.Bubble,
                 data: mapData,
@@ -159,10 +159,8 @@
                     var fill = place.cy ? "fill:#B4131D;" : "fill:#3E6284;";
                     return fill + 'stroke: #fff; fill-opacity: 0.6;'
                 },
-                click: function(data) {                    
+                click: function(data, path) {      
                     // Stop auto-slide
-                    stopTimer();
-                    
                     if(data.cy) loadCountrySidebar(data)
                     else createRegionsMap(data)
                 },
@@ -178,12 +176,12 @@
                 colors: ["#fafafa", "#3E6284"],
                 limits: chroma.limits(mapData, 'k-means', 10, "ct")
             });
-
+       
             map.getLayer('countries').style({
                 fill: function(l, path) {
-                    var place = _.find(mapData, function(p) {                    
+                    var place = _.find(mapData, function(p) {      
                         return p.lc === l.iso2;
-                    });              
+                    });     
                     return place ? colorscale.getColor(place["ct"]) : "white"
                 }
             })
@@ -238,17 +236,18 @@
     }
 
     function resizeMap() {
-        var ratio = map.viewAB.width / map.viewAB.height;
-        $map.height( $map.width() / ratio );
+        // var ratio = map.viewAB.width / map.viewAB.height;
+        var ratio = 0.4;
+        $map.height( $map.width() * ratio );
         map.resize();
     }
 
     function configure() {      
         
-          $workspace = $("#workspace"),
-               $form = $workspace.find("form.toolbox"),
-             $slider = $form.find(".date-slider"),
-                $map = $("#map"),
+          $workspace = $("#workspace");
+               $form = $workspace.find("form.toolbox");
+             $slider = $form.find(".date-slider");
+                $map = $("#map");
             $sidebar = $("#sidebar");
         $backToWorld = $map.find(".js-back-to-world");
 
@@ -281,7 +280,7 @@
             }
         });
 
-        map = $K.map( $map, $map.width(), 600 );  
+        map = $K.map( $map, $map.width(), $map.width()*0.4 );  
         // Adds countries to the map
         createCountriesMap();
 

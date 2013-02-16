@@ -17,6 +17,7 @@ module.exports = function(app) {
 
     // Data files
     app.get("/count/:resource.json", dataFile);
+    app.get("/events.json", dataFile);
 
     // Right region file according a country code
     app.get("/region/:country.svg", goToRegionfile)
@@ -52,7 +53,7 @@ var diggIntoArchive =  module.exports.diggIntoArchive = function (req, res) {
  */
 var playTheHistorySidebar =  module.exports.playTheHistorySidebar = function(req, res) {
     // Looks for the country
-    var country = _.findWhere(data.countries, {iso:req.query.country});
+    var country = _.findWhere(data.countries, {iso_alph2_1970:req.query.country});
     // Country not found
     if(!country) return res.send(404, 'Sorry, we cannot find that country!');
 
@@ -90,11 +91,6 @@ var dataFile = module.exports.dataFile = function (req, res) {
     // Get the data according the resource name
     switch(req.params.resource) {
         
-        case "events":
-            // Return the data in JSON
-            return res.json(data.events);       
-            break;
-
         case "ngrams":
             return data.getNgramByWeek(req.query.q, function(err, result) {                
                 if(err) {
@@ -119,6 +115,10 @@ var dataFile = module.exports.dataFile = function (req, res) {
             json = data.citiesByMonth;            
             break;
 
+        default:
+            // Return the data in JSON
+            return res.json(data.events);   
+            break;
     }
 
     // Filter data from static files    
@@ -169,7 +169,7 @@ var dataFile = module.exports.dataFile = function (req, res) {
     // Expend location label
     json = _.map(json, function(d) {
         // Looks for the country
-        var country = _.findWhere(data.countries, {iso: d.cy || d.lc} );
+        var country = _.findWhere(data.countries, {iso_alph2_1970: d.cy || d.lc} );
         d.label = country ? country.name : "";
         return d;
     });
