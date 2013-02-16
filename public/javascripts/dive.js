@@ -159,7 +159,6 @@
                 // Prepare values items
                 var values = _.map(values, function(item) {     
                     // Parse the given date    
-                    console.lo            
                     item.dt = parseDate(item.dt);
                     return item;
                 });
@@ -217,7 +216,6 @@
             .attr("class", "line")          
             .attr("d", function(d) { return line(d.values); })        
             .style("stroke", function(d) {  
-                console.log(d.name)
                 return color(d.name);
             });            
                 

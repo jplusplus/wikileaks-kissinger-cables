@@ -133,16 +133,19 @@
         return (months <= 0 ? 0 : months) + 1;
     }
 
-    function createTooltip(data) {
+    function createTooltip(meta) {
         
-        if(data.iso2) {
-            data = _.findWhere(mapData, { lc: data.iso2 });
-        }
+        if(meta.iso2) {            
+            _.each(mapData, function(data) {
+                var elem = _.findWhere(data, { lc: meta.iso2 });
+                if(elem) meta = elem;
+            })
+        };
 
-        if(data) {
-            var city = data.cy ? data.lc + ", " : "",
-             matches = "<br /><small>with <strong>%d</strong> occurences</small>".replace("%d", data.ct);
-            return city + data.label + matches; 
+        if(meta) {
+            var city = meta.cy ? meta.lc + ", " : "",   
+            matches = "<br /><small>with <strong>%d</strong> occurences</small>".replace("%d", meta.ct);
+            return city + meta.label + matches; 
         } else {
             return false;
         }
