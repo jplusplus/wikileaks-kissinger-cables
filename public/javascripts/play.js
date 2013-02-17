@@ -294,19 +294,14 @@
             arrows:false,
             valueLabels:'hide',
             bounds: {
-                min: new Date(1973,1,1), 
-                max: new Date(1977,1,1)
-            },
-            formatter:function(val){
-                var month = val.getMonth(),
-                year = val.getYear();
-                return year + "/" + month;
+                min: new Date(1972,12,1), 
+                max: new Date(1976,12,1)
             },
             step: {
                 months:1
             },
             defaultValues:{
-                min: new Date(1973,1,1), 
+                min: new Date(1972,12,1), 
                 max: new Date(1973,3,1)
             }
         });
@@ -339,7 +334,7 @@
             // Cursor at the end
             if( slideValues.max >= new Date(1976,12,1) ) {
                 // Re-initialize the slider
-                $slider.dateRangeSlider("values", new Date(1973,1,1), new Date(1973,2,1));
+                $slider.dateRangeSlider("values", new Date(1972,12,1), new Date(1973,2,1));
             }
          
             timer.toggle();
