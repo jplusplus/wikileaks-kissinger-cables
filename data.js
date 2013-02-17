@@ -38,6 +38,7 @@ module.exports = function() {
             });
 
     csv().from(dataDir + "events.csv", { columns: true })
+            .transform(locationsToArray)
             .to.array(function(data) {
                 module.exports.events = data;
                 console.log("%d events extracted from file.", data.length)
@@ -82,6 +83,11 @@ module.exports = function() {
 
 var dateStringToTimestamp = function(row, index) {
     row.dt = new Date(row.dt).getTime()/1000;
+    return row;
+}
+
+var locationsToArray = function(row, index) {
+    row.locations = row.locations.split(",");
     return row;
 }
 

@@ -79,9 +79,6 @@
 
     function loadRegionsData(country) {
 
-        // Hides the sidebar
-        $sidebar.addClass("hide");
-
         var slotSize = getSlotSize();        
         // Did the slot size change ?
         if(slotSize != mapSlotSize) {

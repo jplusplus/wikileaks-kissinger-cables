@@ -52,8 +52,45 @@ var diggIntoArchive =  module.exports.diggIntoArchive = function (req, res) {
  * @param  {Object} res Server result
  */
 var playTheHistorySidebar =  module.exports.playTheHistorySidebar = function(req, res) {
+    
     // Looks for the country
     var country = _.findWhere(data.countries, {iso_alph2_1970:req.query.country});
+
+    // Gets events from freebase
+    var events  = _.filter(data.freebaseEvents, function(ev) {
+        // Events in the given date basket
+        return (  ( ev.start_date >= req.query.startYear && ev.start_date <= req.query.endYear )                
+               || ( ev.end_date   >= req.query.startYear && ev.end_date   <= req.query.endYear )                
+            ) && ( 
+                // With the country in its name
+                ev.name.toUpperCase().indexOf( country.name.toUpperCase() ) > -1
+                // OR matching to the location
+                || ev.locations.indexOf(country.name) > -1 
+            );
+    });
+
+    // Gets events from our manual databse
+    events = events.concat(_.filter(data.events, function(e) {
+
+        // Work on clone of the event (to edit it)
+        var ev = _.clone(e);
+        ev.start_date = new Date(ev.start_date).getFullYear();
+        ev.end_date   = new Date(ev.end_date).getFullYear();
+
+        // Events in the given date basket
+        return (  ( ev.start_date >= req.query.startYear && ev.start_date <= req.query.endYear )                
+               || ( ev.end_date   >= req.query.startYear && ev.end_date   <= req.query.endYear )                
+            ) && ( 
+                // It's a world event
+                ev.locations.indexOf("WORLD") > -1 
+                // With the country in its name
+                || ev.name.toUpperCase().indexOf( country.name.toUpperCase() ) > -1
+                // OR matching to the location
+                || ev.locations.indexOf(country.name) > -1 
+                || ev.locations.indexOf(req.query.country) > -1 
+            );
+    }));
+
     // Country not found
     if(!country) return res.send(404, 'Sorry, we cannot find that country!');
 
@@ -62,17 +99,7 @@ var playTheHistorySidebar =  module.exports.playTheHistorySidebar = function(req
         startYear : req.query.startYear, 
         endYear   : req.query.endYear,
         // Get the events for the given query    
-        events    : _.filter(data.freebaseEvents, function(ev) {
-            // Events in the given date basket
-            return (  ( ev.start_date >= req.query.startYear && ev.start_date <= req.query.endYear )                
-                   || ( ev.end_date   >= req.query.startYear && ev.end_date   <= req.query.endYear )                
-                ) && ( 
-                    // With the country in its name
-                    ev.name.toUpperCase().indexOf( country.name.toUpperCase() ) > -1
-                    // OR matching to the location
-                    || ev.locations.indexOf(country.name) > -1 
-                );
-        })
+        events    : events
     });
 
 };
