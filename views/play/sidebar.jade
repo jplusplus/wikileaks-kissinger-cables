@@ -9,7 +9,7 @@
     else
         h3 What happened in&nbsp;<em>#{country.name}</em><br />between <em>#{startYear}</em>&nbsp;and&nbsp;<em>#{endYear}</em>?
     
-a.btn.btn-large.go-to-docs Launch search trough the documents
+a(href=searchUrl, target="_blank").btn.btn-large.go-to-docs Launch search trough the documents
 if events.length
     .events
         h4 Remember, it was the period of:

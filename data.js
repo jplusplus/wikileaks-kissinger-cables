@@ -308,7 +308,7 @@ var getNgramByWeek = module.exports.getNgramByWeek = function(query, callback) {
     // Terms to look for
           terms = query.split(","); 
     // Query maximum number
-    var limit = 6;
+    var limit = 3;
 
     for( var t in terms )  {    
         var term = terms[t].trim();

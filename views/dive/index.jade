@@ -5,14 +5,20 @@ block content
     
     form.toolbox(action="/count/ngrams.json", method="GET")#search
         .row-fluid          
-            .span6        
+            .span7     
                 h3.hint What? 
-                .hint Find the evolution of a trending topic into the documents, between 1973 and 1976.
-                .input-append.top10
-                    input(type="text",name="q", value="Nixon,Watergate", placeholder="Comma-separated words: Watergate, Nixon, etc")                             
+                .hint Find the evolution of a trending topic into the documents, between 1973 and 1976.  
+                .top10              
+                    input(type="text",name="q", value="Nixon,Watergate", placeholder="Comma-separated words: Watergate, Nixon, etc")
+                    .go-to-search 
+                        | or 
+                        a(href=searchUrl, data-href=searchUrl, target="_blank") launch the search engine
+
             .span5.hidden-phone.need-inspiration                          
                 h3.hint Need inspiration?
-                .hint Try the following terms:
+                .hint Try the following terms: 
+                    - suggest = ['Nixon', 'Watergate', 'OPEC', 'Angola', 'Vietnam', 'Helsinki', 'Scandal', 'Terrorism', 'Franco', 'Cyprus', 'Turkish']
+                    !="<a>" + suggest.join("</a>, <a>") + "</a>."
 
 
     #trends

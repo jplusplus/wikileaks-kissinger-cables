@@ -1,5 +1,6 @@
 // Dependencies
 var    _ = require("underscore"),
+  config = require("config"),
     data = require("../data")(); // Initialize data
 
 /**
@@ -43,7 +44,10 @@ var playTheHistory =  module.exports.playTheHistory = function(req, res) {
  * @param  {Object} res Server result
  */
 var diggIntoArchive =  module.exports.diggIntoArchive = function (req, res) {
-    res.render("dive", {title: "Dive into the archive"});
+    res.render("dive", {
+        title: "Dive into the archive",
+        searchUrl: config["search-engine"]["url"]
+    });    
 }
 
 /**
@@ -99,7 +103,8 @@ var playTheHistorySidebar =  module.exports.playTheHistorySidebar = function(req
         startYear : req.query.startYear, 
         endYear   : req.query.endYear,
         // Get the events for the given query    
-        events    : events
+        events    : events,
+        searchUrl: config["search-engine"]["url"] + "?q=" + escape(country.name)
     });
 
 };

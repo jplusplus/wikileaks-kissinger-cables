@@ -11,7 +11,7 @@
 @import "dive.less";
 
 
-a:hover { text-decoration:none; }
+a:hover { text-decoration:none; cursor:pointer; }
 
 #workspace {    
     margin:20px 20px;
@@ -45,7 +45,7 @@ a:hover { text-decoration:none; }
         padding:20px;
         padding-left:30px;
         background:darken(@toolboxColor, 1%);
-        
+
         .csstransforms &:before {
             content:"";
             position:absolute;
@@ -69,6 +69,13 @@ a:hover { text-decoration:none; }
     .timeline {
         margin-top:10px;
         float:left;
+    }
+
+    .go-to-search {
+        width:80%;
+        padding-left:10px;
+        padding-top:5px;
+        text-align:right;
     }
 
     .btn-play {

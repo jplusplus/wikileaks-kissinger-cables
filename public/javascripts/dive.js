@@ -7,7 +7,8 @@
        graph = "#graph",
       $graph = $(graph),
      $search = $("#search"),
-      $types = $(".select-events-type")
+      $types = $(".select-events-type"),
+     $inspir = $(".need-inspiration a");
 
     // Global data object and events 
     var  data = {}, events = [],
@@ -17,7 +18,7 @@
     indicator = "part",
     // Graph sizes
     sizes = {
-        margin : {top: 40, right: 40, bottom: 0, left: 40},
+        margin : {top: 40, right: 40, bottom: 10, left: 40},
         graphHeight : 250,
         width  : 0,
         height : 0,
@@ -58,11 +59,19 @@
             .y(function(d) { return y(d[indicator]); });
 
     /**
-     * Configure the color set and return the color
+     * Configure the color set for the graph
      * @type    {Function}
      * @return  {String}
      */
-    var color = d3.scale.category20b();
+    var color = d3.scale.ordinal().range(["#B41316", "#3E6284", "#0DC100", "#850353", "#854103", "#ff7a33"]);
+
+    /**
+     * Configure the color set for events
+     * @type    {Function}
+     * @return  {String}
+     */
+    var colorEvent = d3.scale.ordinal().range(["#58A689", "#F2DF80","#D9863D","#D93829"]);
+
 
     /**
      * Parse the date with the given format
@@ -183,7 +192,7 @@
         ]);
 
 
-        // Remove everything in the current graph
+        // Remove every line in the current graph
         svg.selectAll("g").remove();
 
         // Creates Y Axis group
@@ -295,12 +304,26 @@
      * @param  {Object|String} ev   Optional triggered event or string to search
      * @return {Boolean}            Always false to prevent IE bug
      */
-    function launchSearch() {
+    function launchSearch(ev) {
         
         // Get the query to look for
-        var q = $(this).val() || $search.find(":input[name=q]").val();        
+        var q = $(this).val() || $search.find(":input[name=q]").val();                
+        
+        // No more than 3 terms
+        if(q.split(",").length > 3) {
+            $search.find(":input[name=q]").removeTag(ev);            
+            // Alert the user
+            alert("No more than 3 terms!")
+        }
 
-        if(q != undefined) d3.json("/count/ngrams.json?q="+q, drawGraph);
+        if(q != undefined ) {
+            q = escape(q);
+            // Updates the search engine link
+            var $link = $(".go-to-search a");            
+            $link.attr("href", $link.data("href") + "?q=" + q );
+            // Loads the data
+            d3.json("/count/ngrams.json?q="+q, drawGraph);
+        } 
 
         return false;
     }
@@ -324,7 +347,7 @@
             $types.html("Event's categories: ");            
             $.each(types, function(index, type) {
                 var $label = $("<span/>").addClass("active type label").html(type);
-                $label.css("background-color", color(type) );
+                $label.css("background-color", colorEvent(type) );
                 $label.data("type", type);
                 $types.append($label);
             });
@@ -364,7 +387,7 @@
         var rect = ev.append("rect")
                         .attr("rx",3)
                         .style("fill", function(d) { 
-                            return color(d.type)
+                            return colorEvent(d.type)
                         })
                         .attr("height", sizes.eventHeight)
                         .attr("width", function(d) {                                
@@ -422,6 +445,7 @@
                 height:'25px',
                 width:'80%',
                 defaultText:'add a term',
+                maxChars : 25,
                 onAddTag:  launchSearch,
                 onRemoveTag:  launchSearch
             });
@@ -430,6 +454,11 @@
             $search.on("submit", function(ev) {
                 ev.preventDefault();
                 launchSearch();
+            });
+
+            $inspir.on("click", function() {
+                var t = $(this).text();
+                $search.find("[name=q]").addTag(t);
             });
         });
 
