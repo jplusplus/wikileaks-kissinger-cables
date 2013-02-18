@@ -14,8 +14,8 @@
 		@innerBarHeight:@rangeHeight - 3px*2px;
 		height:@innerBarHeight;
 		margin:3px 0;
-		background:lighten(@linkColor, 60);
-		.box-shadow(0 0 4px 0 fade(@linkColor, 70%) inset );
+		background:lighten(@linkColorVariant, 60);
+		.box-shadow(0 0 4px 0 fade(@linkColorVariant, 70%) inset );
 		.border-radius(@innerBarHeight);
 	}
 	.ui-rangeSlider-handle{
@@ -24,12 +24,12 @@
 		height:@rangeHeight;
 		.border-radius(@rangeHeight/2px);
 		cursor:col-resize;
-		background:@linkColor;
+		background:@linkColorVariant;
 	}
 	.ui-rangeSlider-bar{
 		@rangeVerticalMargin:3px;
 		margin: @rangeVerticalMargin 0;
-		background:lighten(@linkColor, 30);
+		background:lighten(@linkColorVariant, 30);
 		height:@rangeHeight - @rangeVerticalMargin*2px;
 		cursor:move;
 		cursor:grab;

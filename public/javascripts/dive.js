@@ -18,7 +18,7 @@
     indicator = "part",
     // Graph sizes
     sizes = {
-        margin : {top: 40, right: 40, bottom: 10, left: 40},
+        margin : {top: 60, right: 40, bottom: 10, left: 40},
         graphHeight : 250,
         width  : 0,
         height : 0,
@@ -63,14 +63,14 @@
      * @type    {Function}
      * @return  {String}
      */
-    var color = d3.scale.ordinal().range(["#B41316", "#3E6284", "#0DC100", "#850353", "#854103", "#ff7a33"]);
+    var color = d3.scale.ordinal().range(["#B41316", "#3194AA", "#0DC100", "#850353", "#854103", "#ff7a33"]);
 
     /**
      * Configure the color set for events
      * @type    {Function}
      * @return  {String}
      */
-    var colorEvent = d3.scale.ordinal().range(["#58A689", "#F2DF80","#D9863D","#D93829"]);
+    var colorEvent = d3.scale.ordinal().range(["#e591a3", "#F2DF80","#e5c291","#D93829"]);
 
 
     /**

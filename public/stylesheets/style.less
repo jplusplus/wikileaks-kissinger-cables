@@ -1,3 +1,4 @@
+@linkColorVariant:#3194AA;
 @activeColor:#B4131D;
 @toolboxColor:#fafafa;
 @toolboxBorder:#D7D7D7;
@@ -11,10 +12,58 @@
 @import "dive.less";
 
 
-a:hover { text-decoration:none; cursor:pointer; }
+a {
+    color:@linkColorVariant;
+    &:hover { 
+        text-decoration:none; 
+        cursor:pointer; 
+    }
+}
 
 #workspace {    
     margin:20px 20px;
+    
+    .sharespace {
+        position:relative;
+        
+        float:right;
+        text-align:center;
+        padding:8px 12px;
+        margin-bottom:10px;
+        border-bottom:1px solid @toolboxBorder;
+        .box-shadow(0 1px 0 0 fade(white, 40) );
+        
+        @media (max-width: 767px) {
+            float:none;
+        }
+
+        .fb-like {
+            position:relative;
+            top:-4px;
+        }
+
+        .csstransforms &:before {
+            position:absolute;
+            top:0; bottom:0;
+            right:0; left:0;
+            z-index:1111;
+            content:"Share";
+            text-transform:uppercase;
+            text-align:center;
+            background:@grayLighter;
+            line-height:45px;
+            text-shadow:1px 1px 0 white;           
+            
+            .translate(0,0);
+            .opacity(100);
+            .transition(0.4s); 
+        }
+
+        &:hover:before {
+            .translate(0, -100%);
+            .opacity(0);
+        }
+    }
 }
 
 .toolbox {
@@ -87,7 +136,7 @@ a:hover { text-decoration:none; cursor:pointer; }
         height:40px;
         margin-top:10px;
         
-        background:@linkColor;   
+        background:@linkColorVariant;   
         .border-radius(50%);
         
         &:after, &:before {  
@@ -244,7 +293,16 @@ a:hover { text-decoration:none; cursor:pointer; }
     .border-radius(0);
     font-size:16px;
     line-height:20px;
+    color:#333333;
 }
+    
+.nav.nav-pills li.active a {
+    color:#fff;
+    
+    &:hover {
+        background:#333333;
+    }
+}  
 
 .tab-pane {    
     border:1px solid @toolboxBorder;

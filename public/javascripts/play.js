@@ -187,10 +187,8 @@
                     return scale(place.ct);
                 },
                 sortBy: 'radius desc',
-                style: function(place) {
-                    // Different color for city or country
-                    var fill = place.cy ? "fill:#B4131D;" : "fill:#3E6284;";
-                    return fill + 'stroke: #fff; fill-opacity: 0.6;'
+                style: function(place) {                    
+                    return 'fill:#3194AA; stroke: #fff; fill-opacity: 0.6;'
                 },
                 click: loadCountrySidebar,
                 tooltip: createTooltip
@@ -202,7 +200,7 @@
         } else {
 
             var colorscale = new chroma.ColorScale({
-                colors: ["#fafafa", "#3E6284"],
+                colors: ["#fafafa", "#3194AA"],
                 limits: chroma.limits(data, 'k-means', 10, "ct")
             });
        

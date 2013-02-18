@@ -17,14 +17,14 @@ block content
             .span5.hidden-phone.need-inspiration                          
                 h3.hint Need inspiration?
                 .hint Try the following terms: 
-                    - suggest = ['Nixon', 'Watergate', 'OPEC', 'Angola', 'Vietnam', 'Helsinki', 'Scandal', 'Terrorism', 'Franco', 'Cyprus', 'Turkish']
+                    - var suggest = ['Nixon', 'Watergate', 'OPEC', 'Angola', 'Vietnam', 'Helsinki', 'Scandal', 'Terrorism', 'Franco', 'Cyprus', 'Turkish']
                     !="<a>" + suggest.join("</a>, <a>") + "</a>."
 
 
     #trends
         .spinner Loading       
 
-        .left40.right40.relative
+        .left30.right20.relative
             .calendar-grid.bottom-label  
                 - for(var year=1973; year<=1976; year++)                    
                     .year
