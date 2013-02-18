@@ -7,7 +7,9 @@ var express = require('express')
   , routes  = require('./routes')
   , http    = require('http')
   , path    = require('path')
-  , config  = require('config');
+  , config  = require('config')
+    , jade  = require('jade')
+      , fs  = require('fs');
   
 var app = express();
 
@@ -39,6 +41,15 @@ app.configure(function(){
   // Pass values too the templates
   app.use(function(req, res, next) {          
     res.locals.req = req; 
+    // Create embed
+    res.locals.getEmbed = function() {
+      // Get the templaye from file
+      var tpl = fs.readFileSync( app.get('views') + "/embed.jade", "utf8");          
+      // Compiles the template function
+      var templateFn = jade.compile(tpl);    
+      // Returne the template parsed   
+      return templateFn({ url: req.headers.referer });
+    };
     next()
   });
 

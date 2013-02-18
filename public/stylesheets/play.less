@@ -1,4 +1,66 @@
 
+.toolbox {
+    
+    .btn-play {
+        position:relative;
+        cursor:pointer;
+        display:block;
+        float:left;
+        width:40px;
+        height:40px;
+        margin-top:10px;
+        
+        background:@linkColorVariant;   
+        .border-radius(50%);
+        
+        &:after, &:before {  
+            content:"";          
+            position:absolute;            
+        }
+
+            
+        &:after {
+            text-align:center;
+            font-size:30px;
+            color:white;
+            width:100%;
+            padding-top:8px;
+            content:"▸";
+        }
+
+
+        &:before {
+            display:none;
+            border:5px solid white;
+            border-top:0;
+            border-bottom:0;
+            width:6px;
+            height:20px;
+            left:50%;
+            top:50%;
+            margin-left:(6px+10px)/-2px;
+            margin-top:20px/-2px;
+        }   
+        
+        &.pause {
+            
+            background:@activeColor;
+            
+            &:after {
+                display:none;
+            }
+            &:before {
+                display:block;
+            }    
+        } 
+    }
+
+    .ui-rangeSlider {
+        margin-left:60px;
+    }
+
+}
+
 #map {
     padding:0;
     width:auto;
@@ -36,6 +98,32 @@
             .box-shadow(0 0 20px 0 fade(black, 0%));
             .translate(100%, 0);            
         }    
+    }
+
+    .disclaimer {
+        
+        @disclaimerWidth:400px;
+        
+        font-size:16px;
+        z-index:110; 
+        position:relative;
+        
+        width:@disclaimerWidth;
+        padding:0;
+        margin:auto;
+        margin-bottom:20px;
+        margin-top:30px;
+        max-width:80%;   
+        
+        background:@toolboxColor;
+        border:1px solid @toolboxBorder;  
+        .box-shadow(0 0 10px 0 fade(black, 10%));   
+        
+        
+        p {
+            padding:10px 20px;
+            padding-bottom:0;
+        }
     }
     
     #sidebar {

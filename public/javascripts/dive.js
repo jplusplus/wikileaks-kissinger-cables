@@ -70,7 +70,7 @@
      * @type    {Function}
      * @return  {String}
      */
-    var colorEvent = d3.scale.ordinal().range(["#e591a3", "#F2DF80","#e5c291","#D93829"]);
+    var colorEvent = d3.scale.ordinal().range(["#91e5b1","#e591a3","#91d6e5", "#F2DF80"]);
 
 
     /**
@@ -317,12 +317,13 @@
         }
 
         if(q != undefined ) {
-            q = escape(q);
+
+            // Loads the data
+            d3.json("/count/ngrams.json?q="+escape(q), drawGraph);
+
             // Updates the search engine link
             var $link = $(".go-to-search a");            
-            $link.attr("href", $link.data("href") + "?q=" + q );
-            // Loads the data
-            d3.json("/count/ngrams.json?q="+q, drawGraph);
+            $link.attr("href", $link.data("href") + "?q=" + escape( q.replace(/,/, "+") ) );
         } 
 
         return false;

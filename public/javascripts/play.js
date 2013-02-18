@@ -219,8 +219,11 @@
             .on('click', createRegionsMap);
         }
     
-        // Removes loading mode
-        $workspace.removeClass("loading");
+        // Keep the spinner until the disclaimer is close
+        if( ! $map.find(".disclaimer").is(":visible") ) {            
+            // Removes loading mode
+            $workspace.removeClass("loading");
+        }
     }
 
     function defaultMapLayers(m, widthLands) {
@@ -257,15 +260,29 @@
     }
 
     function resizeMap() {
+
+        // Do not resize the map until the disclaimer is close
+        if( $map.find(".disclaimer").is(":visible") ) return;
+
         // var ratio = map.viewAB.width / map.viewAB.height;        
+        var ratio = 0.4,
+           height = $map.width() * ratio;
         
-        var ratio = 0.4;
-        $map.height( $map.width() * ratio );
-        
-        //var height = map.viewAB.height > $map.width() * 0.4 ? $map.width() * 0.4 : map.viewAB.height;
-        //$map.height( height );
-        
+        //var height = map.viewAB.height > $map.width() * 0.4 ? $map.width() * 0.4 : map.viewAB.height;                
+        $map.height(height);
         map.resize();
+    }
+
+    function closeDisclaimer() {   
+        // Avoid to recalculate the map size for nothing
+        if( $map.find(".disclaimer").is(":visible") ) {            
+          
+            $map.find(".disclaimer").addClass("hide");
+            // Remove the spinner
+            $workspace.removeClass("loading");
+            // We must resize the map without the disclaimer 
+            resizeMap();
+        }
     }
 
     function configure() {      
@@ -326,6 +343,9 @@
             var slideValues = $slider.dateRangeSlider("values");
             $slider.dateRangeSlider('scrollRight', 1);
 
+            // Ensure that the disclaimer is close
+            closeDisclaimer();
+
             // Cursor at the end
             if( slideValues.max >= new Date(1976,12,1) ) {
                 // Re-initialize the slider
@@ -344,7 +364,8 @@
         // Click on the "go to map" button
         $map.on("click", ".js-back-to-world", createCountriesMap);
 
-
+        // Close the disclaimer
+        $map.find(".disclaimer .btn").on("click", closeDisclaimer);
     }
 
 
