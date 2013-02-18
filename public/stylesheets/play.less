@@ -61,6 +61,24 @@
 
 }
 
+
+.legend {          
+    padding:10px;
+    height:50px;
+    
+    h5 { 
+        padding:0; 
+        margin:0;
+    }
+
+    .gradient {
+        border:1px solid @toolboxBorder;
+        height:15px;
+        
+        #gradient > .horizontal(#fafafa, @linkColorVariant);
+    }
+}
+
 #map {
     padding:0;
     width:auto;
@@ -72,6 +90,21 @@
     svg {
         max-width:100%;        
     }
+
+    .legend {        
+        z-index:50;
+        position:absolute;
+        bottom:20px;
+        left:20px;
+        border:1px solid @toolboxBorder;
+        background:@toolboxColor;
+        .box-shadow(0 0 10px 0 fade(black, 10%)); 
+        
+        &:hover {
+            .opacity(20);
+        }
+    }
+
 
     .js-back-to-world {        
         z-index:50;   
@@ -142,7 +175,7 @@
         .csstransforms &.hide {
             display:block;
             .box-shadow(0 0 20px 0 fade(black, 0%));
-            .translate(-100%, 0);            
+            .translate(-101%, 0);            
         }
 
         // Pseudo right border, invisible in width:100%
