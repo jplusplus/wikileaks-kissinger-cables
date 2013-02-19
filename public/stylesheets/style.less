@@ -23,6 +23,22 @@ a {
     }
 }
 
+#old-browser {
+    z-index:500;
+    
+    position:fixed !important;
+    position:absolute;
+    top:0; bottom:0;    
+    right:0; left:0;
+    
+    background:white;
+    padding:10%;
+    overflow:hidden;
+    
+    display:none;
+    .no-svg &, .no-canvas &, .no-js & { display:block; }
+}
+
 #workspace {    
     margin:20px 20px;
     

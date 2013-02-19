@@ -293,7 +293,9 @@
         }
     }
 
-    function configure() {      
+    function configure() { 
+
+        if(!Modernizr.svg) return;
         
           $workspace = $("#workspace");
                $form = $workspace.find("form.toolbox");

@@ -425,6 +425,7 @@
      */
     (function init() {     
 
+        if(!Modernizr.svg) return;
         
         // Start with events loading
         loadEvents(function() {   
