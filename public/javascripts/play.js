@@ -4,7 +4,9 @@
     var $workspace, $form, $slider, $map, $sidebar, $backToWorld;
 
     function createCountriesMap() {      
-
+        
+        // Stop auto-slide
+        stopTimer();
         // Hides side bar
         $sidebar.addClass("hide");
         // Hides back button
@@ -25,9 +27,12 @@
     }
 
     function createRegionsMap(data, path) {    
-        
+            
+        // Stop auto-slide
+        stopTimer();
         // Remove existing qtips
         $(".qtip").remove();
+
         // shows back button
         $backToWorld.removeClass("hide");        
         // Loading mode
@@ -108,7 +113,7 @@
         };
         
         // Stop auto-slide
-        timer.stop();
+        stopTimer();
 
         // Save the country related to the sidebar
         $sidebar.data("country", country)
@@ -161,9 +166,7 @@
         
         // Records data
         if(d) mapData = d;
-
-        // Removes existing symbols
-        if(symbols) symbols.remove();        
+    
 
         var values = $slider.dateRangeSlider("values");
         mapDataKey = values.min.getFullYear()+""+values.min.getMonth();  
@@ -174,9 +177,16 @@
         
         // The following assetion determines the mode:
         // is the country in a separate field (city view) ?         
-        if(!! data[0].cy) {
+        if(!! data[0].cy ) {
 
-            var scale = $K.scale.sqrt(data, 'ct').range([4, 30]);            
+            var scale = $K.scale.sqrt(data, 'ct').range([4, 30]);
+
+            // Removes existing symbols
+            if(symbols) {
+                // Weird behavior : kartograph throw a warning when removing the symbols groups
+                map.removeSymbols();
+            }
+
             symbols = map.addSymbols({
                 type: $K.Bubble,
                 data: data,
@@ -184,7 +194,8 @@
                     return [place.lg, place.lt];
                 },
                 radius: function(place) {
-                    return scale(place.ct);
+                    var r = scale(place.ct);
+                    return isNaN(r) ? 0 : r;
                 },
                 sortBy: 'radius desc',
                 style: function(place) {                    
@@ -194,16 +205,13 @@
                 tooltip: createTooltip
             });
 
-            // Change the region if you click in an other country
-            map.getLayer("lands").on('click', createRegionsMap);
-
-        } else {
+        } else {  
 
             var colorscale = new chroma.ColorScale({
                 colors: ["#fafafa", "#3194AA"],
                 limits: chroma.limits(data, 'k-means', 10, "ct")
             });
-       
+
             map.getLayer('countries').style({
                 fill: function(l, path) {
 
@@ -318,9 +326,6 @@
             }
         });
 
-        map = $K.map( $map, $map.width(), $map.width()*0.4 );  
-        // Adds countries to the map
-        createCountriesMap();
 
         // Creates play timer
         timer = $.timer(function() {
@@ -333,6 +338,10 @@
             }
 
         }, 1000);
+
+        map = $K.map( $map, $map.width(), $map.width()*0.4 );  
+        // Adds countries to the map
+        createCountriesMap();
 
         // Right map resizing
         $(window).resize(resizeMap);
