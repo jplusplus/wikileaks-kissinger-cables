@@ -88,7 +88,17 @@
     overflow:hidden;
     
     svg {
-        max-width:100%;        
+        max-width:100%;    
+        position:relative;    
+        
+        &:before {
+            content:"";
+            position:absolute;
+            top:0; bottom:0;
+            right:0;
+            width:30px;
+            background: red;
+        }
     }
 
     .legend {        

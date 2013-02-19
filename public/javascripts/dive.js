@@ -323,7 +323,7 @@
 
             // Updates the search engine link
             var $link = $(".go-to-search a");            
-            $link.attr("href", $link.data("href") + "?q=" + escape( q.replace(/,/, "+") ) );
+            $link.attr("href", $link.data("href") + "?q=" + escape( q.replace(/,/g, "+") ) );
         } 
 
         return false;
