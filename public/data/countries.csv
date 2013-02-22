@@ -1,0 +1,152 @@
+name,iso_alph2_2000,iso_alph2_1970,region
+Afghanistan,AF,AF,Asie
+Albania,AL,AL,EurEst
+Algeria,DZ,DZ,Afr
+Angola,AO,AO,Afr
+Argentina,AR,AR,AmSud
+Australia,AU,AU,Asie
+Austria,AT,AT,EurOuest
+Bahamas,BS,BS,AmCent
+Bahrain,BH,BH,MoyO
+Bangladesh,BD,BD,Asie
+Barbados,BB,BB,AmCent
+Belgium,BE,BE,EurOuest
+Dahomey,BJ,BJ,Afr
+Bhutan,BT,BT,Asie
+Bolivia,BO,BO,AmSud
+Botswana,BW,BW,Afr
+Brazil,BR,BR,AmSud
+Bulgaria,BG,BG,EurEst
+Upper Volta,BF,BF,Afr
+Burundi,BI,BI,Afr
+Cambodia,KH,KH,Asie
+Cameroon,CM,CM,Afr
+Canada,CA,CA,AmNord
+Cape Verde,CV,CV,Afr
+Central African Republic,CF,CF,Afr
+Chad,TD,TD,Afr
+Chile,CL,CL,AmSud
+China,CN,CN,Asie
+Colombia,CO,CO,AmSud
+Comoros,KM,KM,Afr
+Congo,CG,CG,Afr
+Zaire,CD,CD,Afr
+Costa Rica,CR,CR,AmCent
+Cote d'Ivoire,CI,CI,Afr
+Cuba,CU,CU,AmCent
+Cyprus,CY,CY,MoyO
+Czechoslovakia,CS,CS,EurEst
+Democratic Republic of Viet-Nam,VD,VD,Asie
+Democratic Yemen,YD,YD,MoyO
+Denmark,DK,DK,EurOuest
+Dominican Republic,DO,DO,AmCent
+Ecuador,EC,EC,AmSud
+Egypt,EG,EG,Afr
+El Salvador,SV,SV,AmCent
+Equatorial Guinea,GQ,GQ,Afr
+Ethiopia,ET,ET,Afr
+Fiji,FJ,FJ,Asie
+Finland,FI,FI,EurOuest
+France,FR,FR,EurOuest
+Gabon,GA,GA,Afr
+Gambia,GM,GM,Afr
+German Democratic Republic,DD,DD,EurEst
+Federal Republic of Germany,DE,DE,EurOuest
+Ghana,GH,GH,Afr
+Greece,GR,GR,EurOuest
+Grenada,GD,GD,AmCent
+Guatemala,GT,GT,AmCent
+Guinea,GN,GN,Afr
+Guinea-Bissau,GW,GW,Afr
+Guyana,GY,GY,AmSud
+Haiti,HT,HT,AmCent
+Honduras,HN,HN,AmCent
+Hungary,HU,HU,EurEst
+Iceland,IS,IS,EurOuest
+India,IN,IN,Asie
+Indonesia,ID,ID,Asie
+Islamic Republic of Iran,IR,IR,MoyO
+Iraq,IQ,IQ,MoyO
+Ireland,IE,IE,EurOuest
+Israel,IL,IL,MoyO
+Italy,IT,IT,EurOuest
+Jamaica,JM,JM,AmCent
+Japan,JP,JP,Asie
+Jordan,JO,JO,MoyO
+Kenya,KE,KE,Afr
+Democratic People's Republic of Korea,KP,KP,Asie
+Republic of Korea,KR,KR,Asie
+Kuwait,KW,KW,MoyO
+Lao People's Democratic Republic,LA,LA,Asie
+Lebanon,LB,LB,MoyO
+Lesotho,LS,LS,Afr
+Liberia,LR,LR,Afr
+Libyan Arab Jamahiriya,LY,LY,Afr
+Luxembourg,LU,LU,EurOuest
+Madagascar,MG,MG,Afr
+Malawi,MW,MW,Afr
+Malaysia,MY,MY,Asie
+Maldives,MV,MV,Asie
+Mali,ML,ML,Afr
+Malta,MT,MT,EurOuest
+Mauritania,MR,MR,Afr
+Mauritius,MU,MU,Afr
+Mexico,MX,MX,AmCent
+Mongolia,MN,MN,SU
+Morocco,MA,MA,Afr
+Mozambique,MZ,MZ,Afr
+Myanmar,MM,MM,Asie
+Nepal,NP,NP,Asie
+Netherlands,NL,NL,EurOuest
+New Zealand,NZ,NZ,Asie
+Nicaragua,NI,NI,AmCent
+Niger,NE,NE,Afr
+Nigeria,NG,NG,Afr
+Norway,NO,NO,EurOuest
+Oman,OM,OM,MoyO
+Pakistan,PK,PK,Asie
+Panama,PA,PA,AmCent
+Papua New Guinea,PG,PG,Asie
+Paraguay,PY,PY,AmSud
+Peru,PE,PE,AmSud
+Philippines,PH,PH,Asie
+Poland,PL,PL,EurEst
+Portugal,PT,PT,EurOuest
+Qatar,QA,QA,MoyO
+Republic of Viet Nam,VN,VN,Asie
+Romania,RO,RO,EurEst
+Rwanda,RW,RW,Afr
+Sao Tome and Principe,ST,ST,Afr
+Saudi Arabia,SA,SA,MoyO
+Senegal,SN,SN,Afr
+Sierra Leone,SL,SL,Afr
+Singapore,SG,SG,Asie
+Somalia,SO,SO,Afr
+South Africa,ZA,ZA,Afr
+Spain,ES,ES,EurOuest
+Sri Lanka,LK,LK,Asie
+Sudan,SD,SD,Afr
+Suriname,SR,SR,AmSud
+Swaziland,SZ,SZ,Afr
+Sweden,SE,SE,EurOuest
+Switzerland,CH,CH,EurOuest
+Syrian Arab Republic,SY,SY,MoyO
+"Taiwan, Province of China",TW,TW,Asie
+United Republic of Tanzania,TZ,TZ,Afr
+Thailand,TH,TH,Asie
+Togo,TG,TG,Afr
+Trinidad and Tobago,TT,TT,AmCent
+Tunisia,TN,TN,Afr
+Turkey,TR,TR,MoyO
+Uganda,UG,UG,Afr
+Union of Soviet Socialist Republics,SU,SU,SU
+United Arab Emirates,AE,AE,MoyO
+United Kingdom,GB,GB,EurOuest
+United States,US,US,AmNord
+Uruguay,UY,UY,AmSud
+Venezuela,VE,VE,AmSud
+Viet Nam,VN,VN,Asie
+Yemen,YE,YE,MoyO
+Socialist Federal Republic of Yugoslavia,YU,YU,EurEst
+Zambia,ZM,ZM,Afr
+Rhodesia,ZW,ZW,Afr
