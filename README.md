@@ -5,8 +5,10 @@ To make the project up and running, you need:
 
 * **Node** 0.8.19
 * **NPM** 1.1.32
-* **PostGreSQL** 9.*
+* **PostGreSQL** 9.1
 
+### Step 0:
+Esnure that postgresql-server-dev-9.1, libxml2, libxml2-dev and gyp packages are present on your system.
 
 ### Step 1: Download the dependencies
 The app is build at the top of the pleasant [Node Package Manager](http://npmjs.org/). To download and set up the whole dependancies three, simply run from the project's root directory :
