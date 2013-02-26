@@ -209,7 +209,7 @@
 
             var colorscale = new chroma.ColorScale({
                 colors: ["#fafafa", "#3194AA"],
-                limits: chroma.limits(data, 'k-means', 10, "ct")
+                limits: chroma.limits(data, 'equal', 10, "ct")
             });
 
             map.getLayer('countries').style({
