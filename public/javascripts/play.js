@@ -208,7 +208,7 @@
         } else {  
 
             var colorscale = new chroma.ColorScale({
-                colors: ["#fafafa", "#3194AA"],
+                colors: ["#fafafa", "#3194AA", "#A83030"],
                 limits: chroma.limits(data, 'equal', 10, "ct")
             });
 
