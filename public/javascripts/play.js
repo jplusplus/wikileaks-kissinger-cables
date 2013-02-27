@@ -208,9 +208,8 @@
         } else {  
 
             var colorscale = new chroma.ColorScale({
-                colors: ["#F0EF4C", "#22313F"],
-                limits: chroma.limits(data, 'equal', 100, "ct"),
-                mode  : "hcl"
+                colors: ["#FFFFC6", "#CAE9AE", "#85CDBA", "#4DB6C6", "#327EBD", "#3194AA"],
+                limits: chroma.limits(data, 'equal', 100, "ct")
             });
 
             map.getLayer('countries').style({
