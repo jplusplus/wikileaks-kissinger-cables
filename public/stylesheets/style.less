@@ -75,7 +75,7 @@ a {
             content:"Share";
             text-transform:uppercase;
             text-align:center;
-            background:@grayLighter;
+            background:@white;
             line-height:45px;
             text-shadow:1px 1px 0 white;           
             
@@ -239,8 +239,8 @@ a {
 
     margin-bottom:10px;
     
-    background-color: fade(@grayLighter, 90);
-    .box-shadow(0 10px 10px 0 @grayLighter);
+    background-color: fade(@white, 90);
+    .box-shadow(0 10px 10px 0 @white);
     
     @media (max-width: 767px) {
         z-index:300;
@@ -251,19 +251,31 @@ a {
         padding:10px 40px;
     }
 
-    li a {
-        .border-radius(0);
-        font-size:16px;
-        line-height:20px;
-        color:#333333;
+    li {
+
+        margin-right:20px;
+        
+        a {
+            .border-radius(0);
+            font-size:16px;
+            line-height:20px;
+            color:#333333;      
+            .border-radius( 0px 0px 5px 5px );
+            background:#eee;
+            border-bottom:5px solid #ddd;
+            
+            &:hover {
+                color:#fff;
+                background:#333333;            
+            }
+            
+        }
     }
 
     li.active a {
         color:#fff;
-        
-        &:hover {
-            background:#333333;
-        }
+        background:rgb(142, 209, 224); 
+        border-bottom:5px solid rgb(84, 169, 188);     
     }  
 }
     
