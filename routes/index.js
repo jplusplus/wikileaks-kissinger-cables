@@ -98,13 +98,18 @@ var playTheHistorySidebar =  module.exports.playTheHistorySidebar = function(req
     // Country not found
     if(!country) return res.send(404, 'Sorry, we cannot find that country!');
 
+    var searchUrl = config["search-engine"]["url"];
+    searchUrl += "?q=" + escape(country.name);
+    searchUrl += "&amp;qtfrom=" +  escape(req.query.startYear + "-01-01");
+    searchUrl += "&amp;qtto=" +  escape(req.query.endYear + "-12-31");
+   
     res.render("play/sidebar", {
         country   : country, 
         startYear : req.query.startYear, 
         endYear   : req.query.endYear,
         // Get the events for the given query    
         events    : events,
-        searchUrl: config["search-engine"]["url"] + "?q=" + escape(country.name)
+        searchUrl : searchUrl
     });
 
 };
