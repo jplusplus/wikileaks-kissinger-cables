@@ -30,12 +30,13 @@ html.no-js
         .sharespace.embed
             input.input-block-level(type="text", value=getEmbed() )
             
-        ul.nav.nav-pills
+        ul.nav.nav-pills.hidden
             li(class=req.path == "/play" ? "active" : "")
                 a(href="/play") Play the history         
             li(class=req.path == "/dive" ? "active" : "")
                 a(href="/dive") Dive into the archive        
-    
+        
+        .clearfix
         .tab-content
             .tab-pane.active
                 block content
