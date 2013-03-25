@@ -62,11 +62,44 @@
 }
 
 
+.notice {
+    z-index:50;
+    width:260px;
+    padding:10px 0;
+    position:absolute;
+    bottom:140px;
+    left:20px;
+    
+    border:1px solid @toolboxBorder;
+    background:@toolboxColor;
+    .box-shadow(0 0 10px 0 fade(black, 10%)); 
+    font-weight:bold;
+    text-transform:uppercase;
+    text-align:center;
+    
+    &:hover {
+        .opacity(20);
+    }
+    .cities, .countries {
+        display:none;
+    }
+
+    &.see-cities .cities{ display:block }
+    &.see-countries .countries { display:block }
+    
+    
+}
+
+
 .legend {          
     padding:10px;
     height:85px;
     width:240px;
     
+    &:hover {
+        .opacity(20);
+    }
+
     h5 { 
         padding:0; 
         margin:0;
@@ -83,6 +116,7 @@
         
         #gradient > .horizontal(#FFFFC6, @linkColorVariant);
     }
+
 }
 
 #map {
@@ -114,11 +148,7 @@
         left:20px;
         border:1px solid @toolboxBorder;
         background:@toolboxColor;
-        .box-shadow(0 0 10px 0 fade(black, 10%)); 
-        
-        &:hover {
-            .opacity(20);
-        }
+        .box-shadow(0 0 10px 0 fade(black, 10%));         
     }
 
 

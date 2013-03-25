@@ -1,7 +1,7 @@
 (function(window, jQuery, undefined) {
     "use strict"
     var map, mapData, mapDataKey, mapSlotSize, symbols, timer;
-    var $workspace, $form, $slider, $map, $sidebar, $backToWorld;
+    var $workspace, $form, $slider, $map, $sidebar, $backToWorld, $notice;
 
     function createCountriesMap() {      
         
@@ -13,6 +13,9 @@
         $backToWorld.addClass("hide");
         // Remove slot size to force data reload
         mapSlotSize = -1;
+
+        // Show the right notice text
+        $notice.removeClass("see-cities").addClass("see-countries");
 
         map.loadMap('/data/wor.svg', function(m) {                          
             // Resize the map to fit corectly to its parent
@@ -44,6 +47,9 @@
         var country = data.iso2 || data.lc;     
         // Nothing to do
         if(!country) return     
+
+        // Show the right notice text
+        $notice.removeClass("see-countries").addClass("see-cities");
 
         map.loadMap("/region/" + country + ".svg", function(m) {              
             // Resize the map to fit corectly to its parent
@@ -302,6 +308,7 @@
              $slider = $form.find(".date-slider");
                 $map = $("#map");
             $sidebar = $("#sidebar");
+             $notice = $(".notice");
         $backToWorld = $map.find(".js-back-to-world");
 
         // Configure the tooltips        

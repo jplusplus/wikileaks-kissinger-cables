@@ -98,8 +98,12 @@ var playTheHistorySidebar =  module.exports.playTheHistorySidebar = function(req
     // Country not found
     if(!country) return res.send(404, 'Sorry, we cannot find that country!');
 
+    // Build the query
+    var q = country.name;
+    if(country.iso_alph2_1970 == "SU") q += " USSR"
+
     var searchUrl = config["search-engine"]["url"];
-    searchUrl += "?q=" + escape(country.name);
+    searchUrl += "?q=" + escape(q);
     searchUrl += "&amp;qtfrom=" +  escape(req.query.startYear + "-01-01");
     searchUrl += "&amp;qtto=" +  escape(req.query.endYear + "-12-31");
    
