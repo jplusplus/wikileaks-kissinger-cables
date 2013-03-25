@@ -46,10 +46,15 @@ app.configure(function(){
       // Get the templaye from file
       var tpl = fs.readFileSync( app.get('views') + "/embed.jade", "utf8");          
       // Compiles the template function
-      var templateFn = jade.compile(tpl);    
+      var templateFn = jade.compile(tpl);   
       // Returne the template parsed   
-      return templateFn({ url: req.headers.referer });
+      return templateFn({ url: req.protocol + "://" + req.host + req.path + "?no-menu=1" });
     };
+    // Add search URL
+    res.locals.searchUrl = config["search-engine"]["url"];
+    // Activate or not the main menu
+    res.locals.mainMenu = ! req.query["no-menu"];
+
     next()
   });
 

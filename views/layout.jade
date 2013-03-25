@@ -21,6 +21,18 @@ html.no-js
 
   body
 
+
+    if mainMenu
+        #topnav
+            h3.tc Public Library of US Diplomacy: PlusD
+            a.button(href=searchUrl,target="_blank") Text Search
+            a.button(href="/play") Browse Map
+            a.button(href="/dive") Make Timegraph
+            a.button(href=searchUrl + "/search.php",target="_blank") Browse TAGS
+            a.button(href=searchUrl + "/graphics.php",target="_blank") Images Library
+
+            p.warning This tool only searches The Kissinger Cables dataset.
+
     #workspace
 
         .sharespace

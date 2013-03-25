@@ -35,7 +35,7 @@ module.exports = function(app) {
  * @param  {Object} res Server result
  */
 var playTheHistory =  module.exports.playTheHistory = function(req, res) {
-    res.render("play", {title: "Play the history"});
+    res.render("play", { title: "Play the history" });
 }
 
 /**
@@ -44,10 +44,7 @@ var playTheHistory =  module.exports.playTheHistory = function(req, res) {
  * @param  {Object} res Server result
  */
 var diggIntoArchive =  module.exports.diggIntoArchive = function (req, res) {
-    res.render("dive", {
-        title: "Dive into the archive",
-        searchUrl: config["search-engine"]["url"]
-    });    
+    res.render("dive", { title: "Dive into the archive" });    
 }
 
 /**
