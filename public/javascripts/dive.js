@@ -27,8 +27,32 @@
         eventMargin : 5,
         eventFontSize : "0.85em"
     };
+    // An array of deactivated date ranges
+    var deactivatedDateRanges = [
+        { start: new Date(1975, 11, 1).getTime(), end: new Date(1975, 11, 15).getTime() },
+        { start: new Date(1976, 2, 8).getTime(), end: new Date(1976, 3, 5).getTime() },
+        { start: new Date(1976, 4, 25).getTime(), end: new Date(1976, 5, 7).getTime() }
+    ];
     // -------------------------------------------------------------------------
 
+
+
+    /**
+     * Determines if the given data is defined according the global date range array
+     * @param  {Object}  d Data object
+     * @return {Boolean}   True if the data are defined
+     */
+    var isDefined = function(d) {
+        
+        var defined = true 
+        $.each(deactivatedDateRanges, function(i, range) {
+            if(defined) {
+                defined = d.dt <= range.start || d.dt >= range.end;
+            }
+        })
+
+        return defined;
+    }
 
 
     /**
@@ -55,6 +79,7 @@
      */
     var line = d3.svg
         .line().interpolate("basis")
+            .defined(isDefined)
             .x(function(d) { return x(d.dt); })
             .y(function(d) { return y(d[indicator]); });
 
@@ -199,7 +224,15 @@
         svg.append("g")                
                 .attr("class", "y axis")
                 // Create the axis
-                .call(yAxis);
+                .call(yAxis)
+                    .append("text")
+                        .attr("class", "label")
+                        .attr("transform", "rotate(-90)")
+                        .attr("y", 6)
+                        .attr("dy", ".71em")
+                        .style("text-anchor", "end")
+                        .text("Proportion (%)");
+
 
         // Add rulers groups  along side Y Axis
         var yrule = svg.selectAll("g.y.axis")
@@ -220,14 +253,12 @@
                     .attr("class", "ngram");
 
 
-
         ngram.append("path")
-            .attr("class", "line")          
-            .attr("d", function(d) { return line(d.values); })        
+            .attr("class", "line")                   
+            .attr("d", function(d) { return line(d.values); })                       
             .style("stroke", function(d) {  
                 return color(d.name);
-            });            
-                
+            });       
 
 
         var focus = svg.selectAll(".focus")
@@ -240,7 +271,31 @@
         var focusRuler = focus.append("line")
             .attr("class", "focusRuler")            
             .attr("x1", x).attr("x2", x)
-            .attr("y1", 0).attr("y2", sizes.height);
+            .attr("y1", -40).attr("y2", sizes.height);
+
+
+        // Add gray rect on deactivated dates range
+        var blank = svg.append("g")
+                        .attr("class", "blank")                
+                        .selectAll(".blank")
+                        .data(deactivatedDateRanges)
+                        .enter()
+                        .append("g")
+                            .attr("class", "blank")
+                            .append("rect")                        
+                                .style("fill", "#eef")
+                                .style("opacity", 0.4)
+                                .attr("height", sizes.graphHeight)
+                                .attr("width", function(d) {                                
+                                    return x(d.end) - x(d.start);
+                                })
+                                .attr("x", function(d) {                                
+                                    return x(d.start);
+                                })
+                                .attr("y", function(d, index) {                                
+                                    return  0;
+                                })
+
 
         svg.append("rect")
             .attr("class", "overlay")
@@ -252,6 +307,8 @@
                 focus.style("display", "none"); 
             })
             .on("mousemove", mousemove);
+
+
 
         // Add events on the graph
         drawEvents();
@@ -267,21 +324,31 @@
                   tx = d3.mouse(this)[0];
 
             var content = ["<h4>" + formatDate(date) + "</h4>"];     
+            
+            if( ! isDefined({dt: date} )) {
+            
+                content.push("<p>")
+                    content.push("Documents missing for that period.")
+                content.push("</p>")
+                
+            } else {
 
-            $.each(data, function(index, d) {   
-                if(d) {            
-                    var val = bisectDate(d.values, date),                     
-                         bg = color(d.name);
-                    content.push("<div>");
-                        content.push("<span class='label right10' style='background:" + bg + "'>");
-                            content.push(d.name);
-                        content.push("</span>");                        
-                        content.push("<span class='pull-right'>");
-                            content.push( d.values[val]["ct"] + " occurence(s)"  );
-                        content.push("</span>");                        
-                    content.push("</div>");
-                }
-            });
+                $.each(data, function(index, d) {   
+                    if(d) {            
+                        var val = bisectDate(d.values, date),                     
+                             bg = color(d.name);
+                        content.push("<div>");
+                            content.push("<span class='label right10' style='background:" + bg + "'>");
+                                content.push(d.name);
+                            content.push("</span>");                        
+                            content.push("<span class='pull-right'>");
+                                content.push( d.values[val]["ct"] + " occurence(s)"  );
+                            content.push("</span>");                        
+                        content.push("</div>");
+                    }
+                });
+            }
+
 
             var onRight = d3.event.pageX > $(window).width()/2;
 
