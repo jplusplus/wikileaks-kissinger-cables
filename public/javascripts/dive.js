@@ -147,9 +147,10 @@
     function adjustSizes(redraw) {
         
         // Calculates the graph sizes
-        sizes.tolalEventsHeight = (sizes.eventHeight+sizes.eventMargin) * events.length                
-        sizes.height  = sizes.graphHeight + sizes.tolalEventsHeight;
-        sizes.height += sizes.margin.top + sizes.margin.bottom;
+        //sizes.tolalEventsHeight = (sizes.eventHeight+sizes.eventMargin) * events.length                
+        //sizes.height  = sizes.graphHeight + sizes.tolalEventsHeight;
+        //sizes.height += sizes.margin.top + sizes.margin.bottom;
+        sizes.height  = sizes.graphHeight
         sizes.height += $types.outerHeight(true);
         sizes.width   = $graph.innerWidth() - sizes.margin.left - sizes.margin.right;
         sizes.eventsY = sizes.graphHeight + sizes.margin.bottom + $types.outerHeight(true)
@@ -431,6 +432,9 @@
 
     function drawEvents() {
 
+        // Disable this feature
+        return;
+
         // Remove every events in the current graph
         svg.selectAll("g.events").remove();
         
@@ -494,8 +498,7 @@
 
         if(!Modernizr.svg) return;
         
-        // Start with events loading
-        loadEvents(function() {   
+        (function() {   
             // Adjust the graph sizes
             adjustSizes(false);
             adjustRanges();
@@ -529,7 +532,7 @@
                 var t = $(this).text();
                 $search.find("[name=q]").addTag(t);
             });
-        });
+        })();
 
     })();
 
