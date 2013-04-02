@@ -329,7 +329,7 @@
             if( ! isDefined({dt: date} )) {
             
                 content.push("<p>")
-                    content.push("Documents missing for that period.")
+                    content.push("Documents are missing for this period.")
                 content.push("</p>")
                 
             } else {
