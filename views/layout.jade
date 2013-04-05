@@ -23,15 +23,7 @@ html.no-js
 
 
     if mainMenu
-        #topnav
-            h3.tc Public Library of US Diplomacy: PlusD
-            a.button(href=searchUrl,target="_blank") Text Search
-            a.button(href="/dive") Make Timegraph
-            a.button(href="/play") Browse Map
-            a.button(href=searchUrl + "/search.php",target="_blank") Browse TAGS
-            a.button(href=searchUrl + "/graphics.php",target="_blank") Images Library
-
-            p.warning This tool only searches The Kissinger Cables (1973-1976) dataset
+        include sidebar
 
     #workspace
 
@@ -40,15 +32,8 @@ html.no-js
             .fb-like(data-send="false",data-layout="button_count",data-width="100",data-show-faces="false")
 
         .sharespace.embed
-            input.input-block-level(type="text", value=getEmbed() )
-            
-        ul.nav.nav-pills.hidden
-            li(class=req.path == "/play" ? "active" : "")
-                a(href="/play") Browse Map       
-            li(class=req.path == "/dive" ? "active" : "")
-                a(href="/dive") Make Timegraph     
+            input.input-block-level(type="text", value=getEmbed() )         
         
-        .clearfix
         .tab-content
             .tab-pane.active
                 block content

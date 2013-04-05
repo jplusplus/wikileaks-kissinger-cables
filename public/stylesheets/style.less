@@ -39,32 +39,127 @@ a {
     .no-svg &, .no-canvas &, .no-js & { display:block; }
 }
 
+.button {
+    text-decoration: none;
+    border: 1px solid #666;
+    padding: 5px;
+    text-align: center;
+    font-weight: bold;
+    font-size: medium;
+    color: #216B7C;
+    display: inline-block;
+    margin-bottom:3px;
+}
+.button:visited {
+    color: #216B7C;
+}
+
+
 #topnav {
     text-align: center;
     font-family: sans-serif;
 
-     .button {
-            text-decoration: none;
-            border: 1px solid #666;
-            width: 190px;
-            padding: 5px;
-            text-align: center;
-            font-weight: bold;
-            font-size: medium;
-            color: #216B7C;
-            margin: 5px;    
-            margin-top: 3px;
-            margin-bottom: 10px;
-            display: inline-block;
+    .button {        
+        margin: 5px;    
+        margin-top: 3px;
+        margin-bottom: 10px;
     }
-    .button:visited {
-            color: #216B7C;
-    }
-
 
     .warning {
         font-weight:bold;
         text-align:center;
+    }
+}
+
+
+#leftmenu {
+    float: left;
+    width: 200px;
+    clear: none;
+    padding-left: 15px;
+    padding-right: 10px;
+    margin-bottom:10px;
+    font: 12px sans-serif;
+    
+    h3 {
+        text-align: center;
+        font-weight: bold;
+        font-size: small;
+        margin-bottom: 5px;
+        margin-top: 5px;
+        padding:0;
+        line-height:17px;
+        font-family: sans-serif;
+    }
+
+    .menubutton {
+        margin-top: 5px;
+        text-align: center;
+        border: 3px solid #fff;
+        width: 200px;
+    }
+
+    .button {
+        display: block;
+        border: 1px solid #666;
+    }
+    
+    a:hover {
+        background: #eee; /*#34BEED;*/
+    }
+
+    .pick {
+        a {
+            display: inline-block;
+            width: 50px;
+            color: #216B7C;
+            text-align: center;
+        }
+    }
+
+    .wide {
+        text-align: justify;
+        a { 
+            width: auto; 
+            margin-right:5px;
+        }
+    }
+
+    .sort {
+        a {
+            display: block;
+            color: #216B7C;
+        }
+    }
+}
+
+#leftmenu .sort, #leftmenu .pick {
+    margin: 0px;
+    margin-top: 5px;
+    text-align: center;
+    border: 1px solid #000;
+    width: 190px;
+    padding: 5px;
+    padding-top: 0px;
+}
+
+#topmenu {
+    text-align: center;
+    clear: both;
+    margin-top:5px;
+    a {
+        background-color: #8ED1E0;
+        color: #fff;
+        font-size: 16px;
+        padding: 10px;
+        text-decoration: none;
+        margin: 5px 0px  0px 15px;        
+        min-width: 90px;
+        display: inline-block;
+    }
+
+    a:hover {
+        background-color: #333;
     }
 }
 
@@ -265,6 +360,11 @@ a {
         //padding-top:45px;
     }
 }
+
+.tab-content {
+    clear:right;
+}
+
 .nav.nav-pills {
 
     margin-bottom:10px;
