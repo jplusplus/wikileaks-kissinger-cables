@@ -225,15 +225,7 @@
         svg.append("g")                
                 .attr("class", "y axis")
                 // Create the axis
-                .call(yAxis)
-                    .append("text")
-                        .attr("class", "label")
-                        .attr("transform", "rotate(-90)")
-                        .attr("y", 6)
-                        .attr("dy", ".71em")
-                        .style("text-anchor", "end")
-                        .text("Proportion (%)");
-
+                .call(yAxis);
 
         // Add rulers groups  along side Y Axis
         var yrule = svg.selectAll("g.y.axis")
