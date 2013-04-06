@@ -1,8 +1,10 @@
 extends ../layout
 
 
-block content
+block prefix
+    h3 Frequency of mentions in the US Diplomatic Cables Over Time
     
+block content
     form.toolbox(action="./count/ngrams.json", method="GET")#search
         .row-fluid          
             .span7     
