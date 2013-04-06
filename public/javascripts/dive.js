@@ -329,13 +329,18 @@
                 $.each(data, function(index, d) {   
                     if(d) {            
                         var val = bisectDate(d.values, date),                     
-                             bg = color(d.name);
-                        content.push("<div>");
+                             bg = color(d.name),
+                           line = d.values[val];
+                        content.push("<div class='clearfix top10'>");
                             content.push("<span class='label right10' style='background:" + bg + "'>");
                                 content.push(d.name);
+                                content.push("<span class='label label-inverse left10'>");
+                                    content.push(line[indicator]);
+                                    content.push("%");
+                                content.push("</span>");                        
                             content.push("</span>");                        
                             content.push("<span class='pull-right'>");
-                                content.push( d.values[val]["ct"] + " occurrence(s)"  );
+                                content.push( line["ct"] + " occurrence(s) through " + line["tt"] + " document(s)" );
                             content.push("</span>");                        
                         content.push("</div>");                        
                     }
