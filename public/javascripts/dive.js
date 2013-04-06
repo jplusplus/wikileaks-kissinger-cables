@@ -335,9 +335,9 @@
                                 content.push(d.name);
                             content.push("</span>");                        
                             content.push("<span class='pull-right'>");
-                                content.push( d.values[val]["ct"] + " occurence(s)"  );
+                                content.push( d.values[val]["ct"] + " occurrence(s)"  );
                             content.push("</span>");                        
-                        content.push("</div>");
+                        content.push("</div>");                        
                     }
                 });
             }

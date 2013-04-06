@@ -151,7 +151,7 @@
 
         if(meta) {
             var city = meta.cy ? meta.lc + ", " : "",   
-            matches = "<br /><small>with <strong>%d</strong> occurences</small>".replace("%d", meta.ct);
+            matches = "<br /><small>with <strong>%d</strong> occurrence(s)</small>".replace("%d", meta.ct);
             return city + meta.label + matches; 
         } else {
             return false;
