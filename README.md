@@ -45,7 +45,7 @@ Finally, import the sql file into your database. **214,549,557 lines, it can be 
     $ psql DATABASE_NAME < ngrams.sql    
 
 ### Step 4: Run!
-To launch the application enter the following commad: 
+To launch the application enter the following command: 
 
     $ node app.js
 
