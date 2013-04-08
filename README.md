@@ -31,24 +31,18 @@ The following environment variables can be use with the highest priority :
 
 ### Step 3: Build the database
 
-1. Download the ngram's database [from that link](http://domain/ngrams.sql.bz2) into your */tmp* folder:
+First, download the ngram's database [from that link](http://domain/ngrams.sql.bz2) into your */tmp* folder:    
     
-```
-    $ cd /tmp
-    $ wget http://domain/ngrams.sql.bz2
-```
+    $ cd /tmp        
+    $ wget http://domain/ngrams.sql.bz2    
 
-1. Extract the downloaded archive: 
+Then extract the downloaded archive: 
 
-```
     $ bzip2 -d ngrams.sql.bz2
-```
-1. Import the sql file into your database. **214,549,557 lines, it can be long**:
 
+Finally, import the sql file into your database. **214,549,557 lines, it can be long**:
  
-```
-    $ psql DATABASE_NAME < ngrams.sql
-```
+    $ psql DATABASE_NAME < ngrams.sql    
 
 ### Step 4: Run!
 To launch the application enter the following commad: 
