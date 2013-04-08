@@ -203,7 +203,7 @@ var goToRegionfile = module.exports.goToRegionfile = function(req, res) {
            fileName = data.getRegionFromPlace(countryCode);
 
     if(fileName) {
-        res.redirect("/data/" + fileName);
+        res.redirect("/plusd/data/" + fileName);
     } else {
         res.send(404, 'Sorry, we cannot find that region!');
     }    
