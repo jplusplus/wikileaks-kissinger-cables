@@ -48,7 +48,7 @@ app.configure(function(){
       // Compiles the template function
       var templateFn = jade.compile(tpl);   
       // Returne the template parsed   
-      return templateFn({ url: req.protocol + "://" + req.host + req.path + "?no-menu=1" });
+      return templateFn({ url: config["search-engine"]["url"] + req.path + "?no-menu=1" });
     };
     // Add search URL
     res.locals.searchUrl = config["search-engine"]["url"];
