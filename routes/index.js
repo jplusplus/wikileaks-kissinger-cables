@@ -12,12 +12,17 @@ module.exports = function(app) {
     // Mains routers
     app.get(config.root + "map", playTheHistory);
     app.get(config.root + "graph", diggIntoArchive);
+    app.get("/map", playTheHistory);
+    app.get("/graph", diggIntoArchive);
 
     // Contextual routers
     app.get(config.root + "play/sidebar", playTheHistorySidebar); 
     app.get(config.root + "map/sidebar", playTheHistorySidebar);
+    app.get("/play/sidebar", playTheHistorySidebar); 
+    app.get("/map/sidebar", playTheHistorySidebar);
 
     // Data files
+    app.get("/count/:resource.json", dataFile);
     app.get(config.root + "count/:resource.json", dataFile);
     app.get(config.root + "events.json", function(req, res) { res.json(data.events) });
 
@@ -26,6 +31,7 @@ module.exports = function(app) {
     app.get(config.root + "region/:country.svg", goToRegionfile)
 
     // Default redirection
+    app.get("/", goToPlay);
     app.get(config.root + "", goToPlay);
 };
 
