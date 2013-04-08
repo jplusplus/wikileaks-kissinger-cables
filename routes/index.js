@@ -22,6 +22,7 @@ module.exports = function(app) {
     app.get(config.root + "events.json", function(req, res) { res.json(data.events) });
 
     // Right region file according a country code
+    app.get("/region/:country.svg", goToRegionfile)
     app.get(config.root + "region/:country.svg", goToRegionfile)
 
     // Default redirection
