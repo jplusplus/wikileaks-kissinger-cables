@@ -1,4 +1,4 @@
-# Pepper Spray
+# Wikileaks: Kissinger Cables
 ## Installation
 ### Software dependencies
 To make the project up and running, you need:
