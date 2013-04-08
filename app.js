@@ -45,6 +45,9 @@ app.configure(function(){
     res.locals.root = config["root"]; 
     // Add search URL
     res.locals.searchUrl = config["search-engine"]["url"];
+    // URL to share
+    res.locals.shareUrl = config["search-engine"]["url"] + req.path.substring(1);
+    
     // Create embed
     res.locals.getEmbed = function() {
       // Get the templaye from file

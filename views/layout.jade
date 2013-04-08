@@ -30,8 +30,8 @@ html.no-js
     #workspace
 
         .sharespace
-            a(href="https://twitter.com/share", data-text="Visualize the Kissinger Documents", data-via="Wikileaks").twitter-share-button Tweet
-            .fb-like(data-send="false",data-layout="button_count",data-width="100",data-show-faces="false")
+            a(href="https://twitter.com/share", data-text="Visualize the Kissinger Documents", data-via="Wikileaks", data-url=shareUrl).twitter-share-button Tweet
+            .fb-like(data-send="false",data-layout="button_count",data-width="100",data-show-faces="false", data-href=shareUrl)
 
         .sharespace.embed
             input.input-block-level(type="text", value=getEmbed() )         

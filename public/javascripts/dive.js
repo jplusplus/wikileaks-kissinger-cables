@@ -35,6 +35,24 @@
     ];
     // -------------------------------------------------------------------------
 
+    /**
+     * @function Get parameters from URL fragment
+     * @src http://stackoverflow.com/questions/4197591/parsing-url-hash-fragment-identifier-with-javascript
+     */
+    var QueryString = function () {
+        var hashParams = {};
+        var e,
+            a = /\+/g,  // Regex for replacing addition symbol with a space
+            r = /([^&;=]+)=?([^&;]*)/g,
+            d = function (s) { return decodeURIComponent(s.replace(a, " ")); },
+            q = window.location.hash.substring(1);
+
+        while (e = r.exec(q)) {            
+           hashParams[d(e[1])] = d(e[2]);
+        }
+
+        return hashParams;
+    };
 
 
     /**
@@ -48,6 +66,7 @@
         $.each(deactivatedDateRanges, function(i, range) {
             if(defined) {
                 defined = d.dt <= range.start || d.dt >= range.end;
+                if( isNaN(d.dt) || isNaN(d.ct) ) defined = false;
             }
         })
 
@@ -186,7 +205,7 @@
     function drawGraph(error, d) {
 
         // Error happens
-        if(error || d&&d.error) return alert("Impossible to create the visualization!");
+        if(error || d&&d.error ) return;
 
         // Save data in the global namespace
         if(d) {
@@ -200,6 +219,9 @@
 
                 return {name: ngram, values: values};
             });
+
+            // Not readable data
+            if(!data[0]) return;
         }
 
         // Colorize input tags
@@ -370,28 +392,42 @@
      * @return {Boolean}            Always false to prevent IE bug
      */
     function launchSearch(ev) {
+
         
         // Get the query to look for
-        var q = $(this).val() || $search.find(":input[name=q]").val();                
-        
+        var q = QueryString().q;             
+
         // No more than 3 terms
-        if(q.split(",").length > 3) {
+        if(q && q.split(",").length > 3) {
             $search.find(":input[name=q]").removeTag(ev);            
             // Alert the user
-            alert("No more than 3 terms!")
+            return alert("No more than 3 terms!");
         }
 
         if(q != undefined ) {
-
+            // Update tags input
+            $search.find("[name=q]").importTags(q);             
             // Loads the data
             d3.json(window.__root__ + "count/ngrams.json?q="+escape(q), drawGraph);
-
             // Updates the search engine link
             var $link = $(".go-to-search a");            
             $link.attr("href", $link.data("href") + "?q=" + escape( q.replace(/,/g, "+") ) );
         } 
 
         return false;
+    }
+
+    function updateHash() { 
+        
+        var q = $(this).val() || $search.find(":input[name=q]").val();        
+
+        if(q) {            
+            // Update hashbang
+            window.location.hash = '#q=' + q.toUpperCase();
+        } else {
+            // Empty hash
+            window.location.hash = '#q';            
+        }        
     }
 
     function loadEvents(callback) {
@@ -515,15 +551,22 @@
                 width:'80%',
                 defaultText:'add a term',
                 maxChars : 25,
-                onAddTag:  launchSearch,
-                onRemoveTag:  launchSearch
+                onAddTag:  updateHash,
+                onRemoveTag:  updateHash
+            });
+
+
+            // Prevent submit event
+            $search.on("submit", function(ev) {
+                ev.preventDefault();   
+                updateHash();
             });
 
             // Search form events
-            $search.on("submit", function(ev) {
-                ev.preventDefault();
-                launchSearch();
+            $(window).on('hashchange', function(e) {   
+                launchSearch(e);
             });
+
 
             $inspir.on("click", function() {
                 var t = $(this).text();
