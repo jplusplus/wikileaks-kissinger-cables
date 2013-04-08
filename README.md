@@ -31,10 +31,32 @@ The following environment variables can be use with the highest priority :
 
 ### Step 3: Build the database
 
+1. Download the ngram's database [from that link](http://domain/ngrams.sql.bz2) into your */tmp* folder:
+    
+    $ cd /tmp
+    $ wget http://domain/ngrams.sql.bz2
+
+1. Extract the downloaded archive:
+
+    $ bzip2 -d ngrams.sql.bz2
+
+1. Import the sql file into your database. **214,549,557 lines, it can be long**:
+
+    $ psql DATABASE_NAME < ngrams.sql
+
+
+### Step 4: Run!
+To launch the application enter the following commad: 
+
+    $ node app.js
+
+Your application is now available from [localhost:3000](http://localhost:3000)!
+
+
 
 ### Common issues
 * **Error: watch ENOSPC**: Do not run the application with DropBox on the same system.
 Link: [https://groups.google.com/forum/?fromgroups=#!topic/nodejs/LX7sz9f-fmY](https://groups.google.com/forum/?fromgroups=#!topic/nodejs/LX7sz9f-fmY)
 
-## Licence
-Copryright © [Journalism++](http://jplusplus.org) - All rights reserved
+## GNU General Public License
+This software is the property of [Journalism++](http://jplusplus.org) and licensed under the [GNU Genral Public License](https://www.gnu.org/licenses/gpl-3.0.txt).
