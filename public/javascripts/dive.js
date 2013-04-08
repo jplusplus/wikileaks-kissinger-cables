@@ -541,8 +541,6 @@
             // Events type toggle
             $types.delegate(".type", "click", toggleEvent);
 
-            // Launch the search once
-            launchSearch();
 
             // Tags system
             $search.find("[name=q]").tagsInput({
@@ -559,13 +557,15 @@
             $search.on("submit", function(ev) {
                 ev.preventDefault();   
                 updateHash();
-            });
+            })
 
             // Search form events
             $(window).on('hashchange', function(e) {   
-                launchSearch(e);
-            });
+                launchSearch(e);   
+            })
 
+            // Launch the search once
+            if(!QueryString().q) updateHash();
 
             $inspir.on("click", function() {
                 var t = $(this).text();
