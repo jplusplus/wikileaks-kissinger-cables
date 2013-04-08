@@ -566,6 +566,7 @@
 
             // Launch the search once
             if(!QueryString().q) updateHash();
+            else launchSearch(); 
 
             $inspir.on("click", function() {
                 var t = $(this).text();
