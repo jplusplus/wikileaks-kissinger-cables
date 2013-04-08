@@ -10,22 +10,21 @@ var    _ = require("underscore"),
 module.exports = function(app) {
 
     // Mains routers
-    app.get("/play", playTheHistory);
-    app.get("/dive", diggIntoArchive);
+    app.get("/plusd/map", playTheHistory);
+    app.get("/plusd/graph", diggIntoArchive);
 
     // Contextual routers
-    app.get("/play/sidebar", playTheHistorySidebar);
+    app.get("/plusd/map/sidebar", playTheHistorySidebar);
 
     // Data files
-    app.get("/count/:resource.json", dataFile);
-    app.get("/events.json", function(req, res) { res.json(data.events) });
+    app.get("/plusd/count/:resource.json", dataFile);
+    app.get("/plusd/events.json", function(req, res) { res.json(data.events) });
 
     // Right region file according a country code
-    app.get("/region/:country.svg", goToRegionfile)
+    app.get("/plusd/region/:country.svg", goToRegionfile)
 
     // Default redirection
-    app.get("/", goToPlay);
-
+    app.get("/plusd/", goToPlay);
 };
 
 
@@ -210,6 +209,6 @@ var goToRegionfile = module.exports.goToRegionfile = function(req, res) {
  * @param  {Object} res Server result
  */
 var goToPlay =  module.exports.goToPlay = function(req, res) {
-    res.redirect("/play");
+    res.redirect("/plusd/map");
 }
 
