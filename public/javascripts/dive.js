@@ -66,7 +66,6 @@
         $.each(deactivatedDateRanges, function(i, range) {
             if(defined) {
                 defined = d.dt <= range.start || d.dt >= range.end;
-                if( isNaN(d.dt) || isNaN(d.ct) ) defined = false;
             }
         })
 
