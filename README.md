@@ -49,7 +49,7 @@ To launch the application enter the following command:
 
     $ node app.js
 
-Your application is now available from [localhost:3000](http://localhost:3000)!
+Your application is now available from [localhost:3000/plusd/](http://localhost:3000/plusd/)!
 
 
 
