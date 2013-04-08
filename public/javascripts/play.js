@@ -227,6 +227,7 @@
                     return place ? colorscale.getColor(place["ct"]) : "white"
                 }
             })
+            
             // Add tooltips
             .tooltips(createTooltip)
             // Add click event
