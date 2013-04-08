@@ -10,20 +10,27 @@ var    _ = require("underscore"),
 module.exports = function(app) {
 
     // Mains routers
+    app.get("/map", playTheHistory);
     app.get("/plusd/map", playTheHistory);
+    app.get("/graph", diggIntoArchive);
     app.get("/plusd/graph", diggIntoArchive);
 
     // Contextual routers
+    app.get("/map/sidebar", playTheHistorySidebar);
     app.get("/plusd/map/sidebar", playTheHistorySidebar);
 
     // Data files
+    app.get("/count/:resource.json", dataFile);
     app.get("/plusd/count/:resource.json", dataFile);
+    app.get("/events.json", function(req, res) { res.json(data.events) });
     app.get("/plusd/events.json", function(req, res) { res.json(data.events) });
 
     // Right region file according a country code
+    app.get("/region/:country.svg", goToRegionfile)
     app.get("/plusd/region/:country.svg", goToRegionfile)
 
     // Default redirection
+    app.get("/", goToPlay);
     app.get("/plusd/", goToPlay);
 };
 
