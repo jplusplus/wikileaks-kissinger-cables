@@ -10,30 +10,22 @@ var    _ = require("underscore"),
 module.exports = function(app) {
 
     // Mains routers
-    app.get("/map", playTheHistory);
-    app.get("/plusd/map", playTheHistory);
-    app.get("/graph", diggIntoArchive);
-    app.get("/plusd/graph", diggIntoArchive);
+    app.get(config.root + "map", playTheHistory);
+    app.get(config.root + "graph", diggIntoArchive);
 
     // Contextual routers
-    app.get("/play/sidebar", playTheHistorySidebar); // CACHE PATCH, TO REMOVE
-    app.get("/plusd/play/sidebar", playTheHistorySidebar);  // CACHE PATCH, TO REMOVE
-    app.get("/map/sidebar", playTheHistorySidebar);
-    app.get("/plusd/map/sidebar", playTheHistorySidebar);
+    app.get(config.root + "play/sidebar", playTheHistorySidebar); 
+    app.get(config.root + "map/sidebar", playTheHistorySidebar);
 
     // Data files
-    app.get("/count/:resource.json", dataFile);
-    app.get("/plusd/count/:resource.json", dataFile);
-    app.get("/events.json", function(req, res) { res.json(data.events) });
-    app.get("/plusd/events.json", function(req, res) { res.json(data.events) });
+    app.get(config.root + "count/:resource.json", dataFile);
+    app.get(config.root + "events.json", function(req, res) { res.json(data.events) });
 
     // Right region file according a country code
-    app.get("/region/:country.svg", goToRegionfile)
-    app.get("/plusd/region/:country.svg", goToRegionfile)
+    app.get(config.root + "region/:country.svg", goToRegionfile)
 
     // Default redirection
-    app.get("/", goToPlay);
-    app.get("/plusd/", goToPlay);
+    app.get(config.root + "", goToPlay);
 };
 
 
@@ -205,7 +197,7 @@ var goToRegionfile = module.exports.goToRegionfile = function(req, res) {
            fileName = data.getRegionFromPlace(countryCode);
 
     if(fileName) {
-        res.redirect("/plusd/data/" + fileName);
+        res.redirect(config.root + "data/" + fileName);
     } else {
         res.send(404, 'Sorry, we cannot find that region!');
     }    
@@ -218,6 +210,6 @@ var goToRegionfile = module.exports.goToRegionfile = function(req, res) {
  * @param  {Object} res Server result
  */
 var goToPlay =  module.exports.goToPlay = function(req, res) {
-    res.redirect("/plusd/map");
+    res.redirect(config.root + "map");
 }
 

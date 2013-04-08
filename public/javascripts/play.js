@@ -17,7 +17,7 @@
         // Show the right notice text
         $notice.removeClass("see-cities").addClass("see-countries");
 
-        map.loadMap('/data/wor.svg', function(m) {                          
+        map.loadMap(window.__root__ + 'data/wor.svg', function(m) {                          
             // Resize the map to fit corectly to its parent
             resizeMap();  
             // Set the map style/layers without lands layer
@@ -51,7 +51,7 @@
         // Show the right notice text
         $notice.removeClass("see-countries").addClass("see-cities");
 
-        map.loadMap("/plusd/region/" + country + ".svg", function(m) {              
+        map.loadMap(window.__root__ + "region/" + country + ".svg", function(m) {              
             // Resize the map to fit corectly to its parent
             resizeMap();      
             // Set the map style/layers with lands layer
@@ -80,7 +80,7 @@
             mapSlotSize = slotSize;
             var params = { slotSize: mapSlotSize };   
             
-            $.getJSON("/plusd/count/countries.json", params, updateMapSymbols);         
+            $.getJSON(window.__root__ + "count/countries.json", params, updateMapSymbols);         
 
         // If not, just update the map
         } else {
@@ -100,7 +100,7 @@
                 regionFrom: country
             };   
             
-            $.getJSON("/plusd/count/cities.json", params, updateMapSymbols);         
+            $.getJSON(window.__root__ + "count/cities.json", params, updateMapSymbols);         
 
         // If not, just update the map
         } else {
@@ -125,7 +125,7 @@
         $sidebar.data("country", country)
 
         // Load the sidebar html
-        $.get("/plusd/map/sidebar", params, function(data) {
+        $.get(window.__root__ + "map/sidebar", params, function(data) {
             // Find the place to insert HTML
             $sidebar.find(".js-content").html(data)
             // Show the sidebar

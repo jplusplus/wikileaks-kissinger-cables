@@ -384,7 +384,7 @@
         if(q != undefined ) {
 
             // Loads the data
-            d3.json("/plusd/count/ngrams.json?q="+escape(q), drawGraph);
+            d3.json(window.__root__ + "count/ngrams.json?q="+escape(q), drawGraph);
 
             // Updates the search engine link
             var $link = $(".go-to-search a");            
@@ -396,7 +396,7 @@
 
     function loadEvents(callback) {
 
-        $.getJSON("/plusd/events.json", function(d) {
+        $.getJSON(window.__root__ + "events.json", function(d) {
             // Parse dates
             events = _.map(d, function(ev) {
                 ev.start_date = new Date(ev.start_date); 

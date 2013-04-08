@@ -26,6 +26,7 @@ app.configure(function(){
 
   // Less middle ware to auto-compile less files
   var publicPath = path.join(__dirname, 'public');
+
   var lessMiddleware = require("less-middleware");
   app.use(lessMiddleware({
     src: publicPath,
@@ -35,12 +36,15 @@ app.configure(function(){
   }));
 
   // Public directory
-  app.use(express.static( publicPath ) );
+  app.use(config.root, express.static(publicPath) );
 
 
   // Pass values too the templates
   app.use(function(req, res, next) {          
-    res.locals.req = req; 
+    res.locals.req = req;        
+    res.locals.root = config["root"]; 
+    // Add search URL
+    res.locals.searchUrl = config["search-engine"]["url"];
     // Create embed
     res.locals.getEmbed = function() {
       // Get the templaye from file
@@ -50,8 +54,6 @@ app.configure(function(){
       // Returne the template parsed   
       return templateFn({ url: config["search-engine"]["url"] + req.path.substring(1) + "?no-menu=1" });
     };
-    // Add search URL
-    res.locals.searchUrl = config["search-engine"]["url"];
     // Activate or not the main menu
     res.locals.mainMenu = ! req.query["no-menu"];
 

@@ -1,5 +1,6 @@
 {
     "host": "http://search.wikileaks.org",
+    "root": "/plusd/",
     "search-engine": {
         "url": "http://search.wikileaks.org/plusd/"
     },

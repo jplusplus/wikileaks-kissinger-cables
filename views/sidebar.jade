@@ -8,9 +8,9 @@
   a(target='_blank', href='http://wikileaks.org/Supporters.html') Supporters
 
 #leftmenu.tc.hidden-tablet.hidden-phone 
-  img.bottom05(src='./images/wl2.jpg', alt='WikiLeaks')
-  a.button(href=searchUrl + 'pressrelease/') Press release
-  a.button(href=searchUrl + 'about/') About PlusD
+  img.bottom05(src='#{root}images/wl2.jpg', alt='WikiLeaks')
+  a.button(href='#{searchUrl}pressrelease/') Press release
+  a.button(href='#{searchUrl}about/') About PlusD
 
   .pick
     h3 Browse by creation date
@@ -194,12 +194,12 @@
   .clearfix
 
 #topnav.tc.top20
-    img(src="./images/cart.jpg", alt="")
+    img(src="#{root}images/cart.jpg", alt="")
     h2
-        img(src="./images/plusdb.png", alt="Public Library of US Diplomacy")
+        img(src="#{root}images/plusdb.png", alt="Public Library of US Diplomacy")
     .hidden-phone
         a.button(href=searchUrl,target="_blank") Text Search
-        a.button(href="/plusd/graph") Make Timegraph
-        a.button(href="/plusd/map") Browse Map
-        a.button(href=searchUrl + "tags/",target="_blank") Browse TAGS
-        a.button(href=searchUrl + "imagelibrary/",target="_blank") Image Library
+        a.button(href="#{root}graph") Make Timegraph
+        a.button(href="#{root}map") Browse Map
+        a.button(href="#{searchUrl}tags/",target="_blank") Browse TAGS
+        a.button(href="#{searchUrl}imagelibrary/",target="_blank") Image Library
