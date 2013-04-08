@@ -16,6 +16,8 @@ module.exports = function(app) {
     app.get("/plusd/graph", diggIntoArchive);
 
     // Contextual routers
+    app.get("/play/sidebar", playTheHistorySidebar); // CACHE PATCH, TO REMOVE
+    app.get("/plusd/play/sidebar", playTheHistorySidebar);  // CACHE PATCH, TO REMOVE
     app.get("/map/sidebar", playTheHistorySidebar);
     app.get("/plusd/map/sidebar", playTheHistorySidebar);
 
