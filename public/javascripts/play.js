@@ -25,7 +25,7 @@
             // Load the data once
             loadCountriesData();
             // Updates value using the slider
-            $slider.off("valuesChanged").on("valuesChanged", loadCountriesData);            
+            $slider.off("valuesChanging").on("valuesChanging", loadCountriesData);            
         });
     }
 
@@ -59,7 +59,7 @@
             // Load the data once
             loadRegionsData(country);            
             // Updates value using the slider
-            $slider.off("valuesChanged").on("valuesChanged", function() {                
+            $slider.off("valuesChanging").on("valuesChanging", function() {                
                 // Load the data passing the country
                 loadRegionsData(country)
                 // Disable loading mode
