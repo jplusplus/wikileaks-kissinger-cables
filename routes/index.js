@@ -70,6 +70,10 @@ var playTheHistorySidebar =  module.exports.playTheHistorySidebar = function(req
         return (  ( ev.start_date >= req.query.startYear && ev.start_date <= req.query.endYear )                
                || ( ev.end_date   >= req.query.startYear && ev.end_date   <= req.query.endYear )                
             ) && ( 
+                // Do not take the indian cricket season (not related to india)
+                ev.name.toLowerCase().indexOf("indian cricket") == -1
+            ) && ( 
+
                 // With the country in its name
                 ev.name.toUpperCase().indexOf( country.name.toUpperCase() ) > -1
                 // OR matching to the location
@@ -77,7 +81,7 @@ var playTheHistorySidebar =  module.exports.playTheHistorySidebar = function(req
             );
     });
 
-    // Gets events from our manual databse
+    // Gets events from our manual database
     events = events.concat(_.filter(data.events, function(e) {
 
         // Work on clone of the event (to edit it)
@@ -88,7 +92,7 @@ var playTheHistorySidebar =  module.exports.playTheHistorySidebar = function(req
         // Events in the given date basket
         return (  ( ev.start_date >= req.query.startYear && ev.start_date <= req.query.endYear )                
                || ( ev.end_date   >= req.query.startYear && ev.end_date   <= req.query.endYear )                
-            ) && ( 
+            ) && (
                 // It's a world event
                 ev.locations.indexOf("WORLD") > -1 
                 // With the country in its name
@@ -114,7 +118,7 @@ var playTheHistorySidebar =  module.exports.playTheHistorySidebar = function(req
     res.render("play/sidebar", {
         country   : country, 
         startYear : req.query.startYear, 
-        endYear   : req.query.endYear,
+        endYear   : req.query.endYear == 1977 ? 1976 : req.query.endYear,
         // Get the events for the given query    
         events    : events,
         searchUrl : searchUrl
