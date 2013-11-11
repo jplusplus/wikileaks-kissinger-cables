@@ -325,15 +325,15 @@
             arrows:false,
             valueLabels:'hide',
             bounds: {
-                min: new Date(1966,12,1), 
-                max: new Date(2010,2,1)
+                min: new Date(1966,1,1), 
+                max: new Date(2010,1,1)
             },
             step: {
                 years:1
             },
             defaultValues:{
-                min: new Date(1966,12,1), 
-                max: new Date(1970,12,1)
+                min: new Date(1966,1,1), 
+                max: new Date(1970,1,1)
             }
         });
 
@@ -344,7 +344,7 @@
             var slideValues = $slider.dateRangeSlider("values");            
             $slider.dateRangeSlider('scrollRight', 1);
 
-            if( slideValues.max >= new Date(2010,2,1) ) {
+            if( slideValues.max >= new Date(2010,1,1) ) {
                 stopTimer();
             }
 
@@ -367,9 +367,9 @@
             closeDisclaimer();
 
             // Cursor at the end
-            if( slideValues.max >= new Date(1976,12,1) ) {
+            if( slideValues.max >= new Date(2010,1,1) ) {
                 // Re-initialize the slider
-                $slider.dateRangeSlider("values", new Date(1972,12,1), new Date(1973,2,1));
+                $slider.dateRangeSlider("values", new Date(1966,1,1), new Date(1970,1,1));
             }
          
             timer.toggle();
