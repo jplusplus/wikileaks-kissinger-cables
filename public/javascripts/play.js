@@ -172,10 +172,11 @@
         
         // Records data
         if(d) mapData = d;
-    
+        
 
         var values = $slider.dateRangeSlider("values");
         mapDataKey = values.min.getFullYear()+""+values.min.getMonth();  
+        console.log(values) 
 
         // Data we work with
         var data = mapData[mapDataKey] || [];
@@ -324,15 +325,15 @@
             arrows:false,
             valueLabels:'hide',
             bounds: {
-                min: new Date(1972,12,1), 
-                max: new Date(1976,12,1)
+                min: new Date(1966,12,1), 
+                max: new Date(2010,2,1)
             },
             step: {
-                months:1
+                years:1
             },
             defaultValues:{
-                min: new Date(1972,12,1), 
-                max: new Date(1973,3,1)
+                min: new Date(1966,12,1), 
+                max: new Date(1970,12,1)
             }
         });
 
@@ -343,7 +344,7 @@
             var slideValues = $slider.dateRangeSlider("values");            
             $slider.dateRangeSlider('scrollRight', 1);
 
-            if( slideValues.max >= new Date(1976,12,1) ) {
+            if( slideValues.max >= new Date(2010,2,1) ) {
                 stopTimer();
             }
 

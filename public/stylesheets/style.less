@@ -262,16 +262,19 @@ a {
     position:absolute;
     top:-8px;
     left:6px;
-    right:6px;
-    height:28px;            
+    right:10px;
+    height:28px;      
+    white-space:nowrap;
 
-    .year, .month {
-        position:relative;                
-        float:left;
-        display:block;
+    .year {
+        position:relative;    
+        display:inline-block;
         height:100%;
         margin:0;
-        padding:0;
+        padding:0;                 
+        width:100%/44%;   
+        height:50%;
+        top:-25%;   
         
         &:before {
             position:absolute;
@@ -280,51 +283,38 @@ a {
             left:-1px;
             width:1px;
             height:100%;        
-            background:fade(@linkColor, 30);                      
+            background:@linkColor;  
         }   
         
         .date-label {
             position:absolute;
             display:block;
-            bottom:80%;
+            bottom:100%;
             left:-25px;
             width:50px;
             color:@gray;
             text-align:center;
-            height:100%;
-        }
-    }
-
-    &.bottom-label {
-        
-        .month {
-            top:-2px;
-        }
-
-        .date-label {
-            top:100%;
-            bottom:auto; 
-        }
-    }
-
-    .year {            
-        width:100%/4%;
-                        
-        &:before {     
-            background:@linkColor;              
-            width:3px
-        }
-    }
-
-    .month {
-        width:100%/12%;   
-        height:70%;
-        top:4px;
-        
-        .date-label {
             font-size:70%;
-        }                                     
+        }                  
+
+        &.decade {
+            height:100%;
+            top:0;
+            
+            &:before {     
+                width:3px;
+            }
+
+            .date-label {
+                font-size:100%;
+            }                                     
+        }
+
+        &.odd .date-label {
+            display:none;
+        }
     }
+
 }
 
 .spinner {
