@@ -57,6 +57,19 @@ app.configure(function(){
       // Returne the template parsed   
       return templateFn({ url: config["search-engine"]["url"] + req.path.substring(1) + "?no-menu=1" });
     };
+
+    res.locals.getYearClass = function(year) {
+      classes = []
+      if(year%10 == 0) classes.push("decade")
+      if(year%2 != 0) classes.push("odd")
+      return classes.join(" ")
+    }
+
+    res.locals.getYearLabel = function(year) {      
+      if(year%10 == 0) return year
+      else return String(year/100).split(".")[1]
+    }
+
     // Activate or not the main menu
     res.locals.mainMenu = ! req.query["no-menu"];
 

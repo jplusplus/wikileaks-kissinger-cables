@@ -240,9 +240,8 @@ var extractCountriesFromRegion = module.exports.extractCountriesFromRegion = fun
  */
 var extractEventsFromFreebase = module.exports.extractEventsFromFreebase = function (callback) {
 
-    var dateBasket = ["1973", "1974", "1975", "1976"];
     // Create the query to freebase to extract event
-    query=[{
+    var query=[{
         "id":         null, 
         "name":       null, 
         "start_date": null, 
@@ -254,8 +253,8 @@ var extractEventsFromFreebase = module.exports.extractEventsFromFreebase = funct
             "limit":     1
         },
         "locations":[],
-        "start_date>=": "1973",
-        "end_date<=": "1976"
+        "start_date>=": "1966",
+        "end_date<=": "2010"
     }];
 
 

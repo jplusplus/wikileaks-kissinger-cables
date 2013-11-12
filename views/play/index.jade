@@ -28,13 +28,10 @@ block content
                 a.btn-play
                 .date-slider
                     .calendar-grid  
-                        - for(var year=1973; year<=1976; year++)                    
-                            .year
-                                .date-label=year
-                                - for(var month=1; month<=12; month++)
-                                    .month
-                                        if month > 1
-                                            .date-label.hidden-phone=month
+                        - for(var year=1966; year<=2010; year++)                    
+                            .year(class=getYearClass(year))
+                                .date-label
+                                    =getYearLabel(year)
 
     #map
         a.js-back-to-world.hide ⊖
