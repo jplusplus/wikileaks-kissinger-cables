@@ -9,7 +9,7 @@ freebase = require("freebase"),
    cache = require('memory-cache');
 
 
-module.exports = function() { 
+module.exports = function() {
 
     var dataDir = "./public/data/";
 
@@ -18,17 +18,31 @@ module.exports = function() {
 
     // Get data from CSV files
     csv().from(dataDir + "countries_by_month.csv", { columns: ["dt","ct", "lc", "lt", "lg"] })
-            .transform(dateStringToTimestamp)
-            .to.array(function(data) {            
+            .transform(dateStringToYear)
+            .to.array(function(data) {
                 module.exports.countriesByMonth = convertCoord(data);
-                console.log("%d countries/count extracted from file.", data.length)
+                console.log("%d countries/count by month extracted from file.", data.length)
+            });
+
+    csv().from(dataDir + "countries_by_year.csv", { columns: ["dt","ct", "lc", "lt", "lg"] })
+            .transform(dateStringToYear)
+            .to.array(function(data) {
+                module.exports.countriesByYear = convertCoord(data);
+                console.log("%d countries/count by year extracted from file.", data.length)
             });
 
     csv().from(dataDir + "cities_by_month.csv", { columns: ["dt","ct", "lc", "lt", "lg", "cy"] })
-            .transform(dateStringToTimestamp)
+            .transform(dateStringToYear)
             .to.array(function(data) {
                 module.exports.citiesByMonth = convertCoord(data);
-                console.log("%d cities/count extracted from file.", data.length)
+                console.log("%d cities/count by month extracted from file.", data.length)
+            });
+
+    csv().from(dataDir + "cities_by_year.csv", { columns: ["dt","ct", "lc", "lt", "lg", "cy"] })
+            .transform(dateStringToYear)
+            .to.array(function(data) {
+                module.exports.citiesByYear = convertCoord(data);
+                console.log("%d cities/count by year extracted from file.", data.length)
             });
 
     csv().from(dataDir + "countries.csv", { columns: true })
@@ -50,7 +64,7 @@ module.exports = function() {
         c.dt = new Date( (c.dt)*1000);
         // Database rows have the date format YYYYMMDD
         // We must convet the week's date
-        var dt = [ c.dt.getFullYear() ] 
+        var dt = [ c.dt.getFullYear() ]
         // Two digits format
         dt.push( ("0" + ( 1*c.dt.getMonth() + 1) ).slice(-2) );
         dt.push( ("0" + c.dt.getDate()).slice(-2) );
@@ -65,10 +79,10 @@ module.exports = function() {
     module.exports.freebaseEvents = [];
 
     // Extract freebase events
-    extractEventsFromFreebase(function(events) {        
+    extractEventsFromFreebase(function(events) {
         module.exports.freebaseEvents = _.map(events, function(e) {
-            e.start_date = new Date(e.start_date).getFullYear(); 
-            e.end_date   = new Date(e.end_date).getFullYear(); 
+            e.start_date = new Date(e.start_date).getFullYear();
+            e.end_date   = new Date(e.end_date).getFullYear();
             return e;
         });
         console.log("%d events extracted from Freebase.", events.length)
@@ -81,8 +95,8 @@ module.exports = function() {
     return module.exports;
 };
 
-var dateStringToTimestamp = function(row, index) {
-    row.dt = new Date(row.dt).getTime()/1000;
+var dateStringToYear = function(row, index) {
+    row.dt = new Date(row.dt).getFullYear();
     return row;
 }
 
@@ -105,9 +119,9 @@ var convertCoord = function(data) {
 };
 
 /**
- * Aggregates every given documents by slot size them by location key 
+ * Aggregates every given documents by slot size them by location key
  * @param  {Array}      docs        Documents list
- * @params {Integer}    slotSize    Month number to group by  
+ * @params {Integer}    slotSize    Month number to group by
  * @params {String}     doctype     Documents type (to use the cache)
  * @return {Array}                  Documents aggregated
  */
@@ -120,53 +134,44 @@ var aggregateDocs = module.exports.aggregateDocs = function(docs, slotSize, doct
         // Get the data from the cache
         d = cache.get(cacheKey);
         // Cache value exists !
-        if(d != null) return d;        
-        // Reset d        
+        if(d != null) return d;
+        // Reset d
         else d = {};
     }
 
-    // Get all different months
-    // using the date attribute
-    // and sort them.
-    var months = _.uniq( 
-                    _.pluck(
-                        module.exports.countriesByMonth, "dt")
-                    ).sort(function(a,b){ return a-b; }),
-      monthLen = months.length;
-    
-    _.each(months, function(m, idx) {
-        // Remove the time in the key
-        m = new Date(m*1000);
-        m = m.getFullYear() +""+ m.getMonth();
-
+    var idx = 0;
+    // Get all different years
+    for(y = 1966; y <= 2010; y++) {
         // For each month, merge data along the slot site
-        if(idx <= monthLen - slotSize + 1) {
-            d[m] = [];
-            for(var j=0; j<=slotSize; j++ ) {                
-                d[m] = d[m].concat( _.where(docs, {dt: months[idx+j] }) );
+        if(idx <= (2010-1966) - slotSize + 1) {
+            d[y] = [];
+            for(var j=0; j<=slotSize; j++ ) {
+                d[y] = d[y].concat( _.where(docs, {dt: 1965 + idx+j }) );
             }
         }
         // Aggreagte by the location the final dataset
-        d[m] = aggregateDocsByLocation(d[m]);  
-        d[m] = _.map(d[m], function(e) {    
+        d[y] = aggregateDocsByLocation(d[y]);
+        obj  = {}
+        // Tranforms the year array into an object
+        _.each(d[y], function(e) {
+            code = e.lc || e.cy
             // Looks for the country
-            var country = _.findWhere(module.exports.countries, {
-                iso_alph2_1970: e.cy || e.lc
-            });
-            e.label = country ? country.name : "";  
+            var country = _.findWhere(module.exports.countries, {iso_alph2_1970: code});
+            e.label = country ? country.name : "";
             // Remove the date (already in the key)
             delete e.dt;
+            obj[code] = e
+        });
+        d[y] = obj
 
-            return e; 
-        });    
-    });
+        idx++
+    }
 
 
     // Puts data into the cache
     if(cacheKey) cache.put(cacheKey, d);
 
     return d;
-
 };
 
 /**
@@ -181,7 +186,7 @@ var aggregateDocsByLocation = module.exports.aggregateDocsByLocation = function(
     return _.map(groupedDocs, function(docs) {
 
         doc = _.clone(docs[0]);
-        doc.ct = _.reduce(docs, function(sum,n) {                                        
+        doc.ct = _.reduce(docs, function(sum,n) {
             return sum += 1*n.ct;
         }, 0);
 
@@ -191,7 +196,7 @@ var aggregateDocsByLocation = module.exports.aggregateDocsByLocation = function(
 }
 
 /**
- * Analyse every region file to know wich countries are available in 
+ * Analyse every region file to know wich countries are available in
  * @return {Object} Countries available by region file
  */
 var extractCountriesFromRegion = module.exports.extractCountriesFromRegion = function() {
@@ -200,9 +205,9 @@ var extractCountriesFromRegion = module.exports.extractCountriesFromRegion = fun
     var libxmljs = require('libxmljs');
     // Files directory
     var dir = './public/data/';
-    // Files to fetch 
+    // Files to fetch
     // ORDER IS IMPORTANT: it defines priority when a country is in 2 regions
-    var regionFiles = [ 
+    var regionFiles = [
         "afr.svg",
         "amc.svg",
         "amn.svg",
@@ -212,20 +217,20 @@ var extractCountriesFromRegion = module.exports.extractCountriesFromRegion = fun
         "euo.svg",
         "moo.svg",
         "su.svg"
-    ];                
+    ];
 
     // Object to recolt the regions' countries
     var res = {};
-    
+
     // Analyse each files
     regionFiles.forEach(function(fileName) {
-        
+
         var file = libxmljs.parseXml( fs.readFileSync(dir+fileName) ),
         // Get every paths containing country id
            paths = file.find('//xmlns:g[@id="countries"]//xmlns:path[@data-iso2]', 'http://www.w3.org/2000/svg');
 
         // Extract every country ids
-        res[fileName] = _.map(paths, function(path) { 
+        res[fileName] = _.map(paths, function(path) {
             return (path.attr('data-iso2').value()  || "").toUpperCase();
         });
 
@@ -242,13 +247,13 @@ var extractEventsFromFreebase = module.exports.extractEventsFromFreebase = funct
 
     // Create the query to freebase to extract event
     var query=[{
-        "id":         null, 
-        "name":       null, 
-        "start_date": null, 
+        "id":         null,
+        "name":       null,
+        "start_date": null,
         "end_date":   null,
         "type":       "/time/event",
         "key": {      // Get the wikipedia key (en)
-            "namespace": "/wikipedia/en_id",  
+            "namespace": "/wikipedia/en_id",
             "value":     null,
             "limit":     1
         },
@@ -267,7 +272,7 @@ var extractEventsFromFreebase = module.exports.extractEventsFromFreebase = funct
  * Get the region file matching to the given place
  * @param  {String} place  Place (or country) to filter with
  * @return {String}        Region's file name
- */ 
+ */
 var getRegionFromPlace = module.exports.getRegionFromPlace = function(place) {
 
     // Get the region file
@@ -275,9 +280,9 @@ var getRegionFromPlace = module.exports.getRegionFromPlace = function(place) {
         // Do the country exist in the curent region file ?
         if( isInRegionFile(place, r) ) {
             // File name is the key
-            return r;            
+            return r;
         }
-    } 
+    }
 
     return false;
 }
@@ -301,39 +306,39 @@ var isInRegionFile = module.exports.isInRegionFile = function(code, fileName) {
 var getNgramByWeek = module.exports.getNgramByWeek = function(query, callback) {
 
     // Force uppercase (all document content are in uppercase)
-    query = query.toUpperCase();    
+    query = query.toUpperCase();
     // Every queries on the same object
     var queries = {},
     // Terms to look for
-          terms = query.split(","); 
+          terms = query.split(",");
     // Query maximum number
     var limit = 3;
 
-    for( var t in terms )  {    
+    for( var t in terms )  {
         var term = terms[t].trim();
         // Avoid looking for an empty string
-        if(term !== "") {                
+        if(term !== "") {
             // Create a closure function
-            queries[term] = function(term)  { 
+            queries[term] = function(term)  {
                 return function(callback) {
-                    
+
                     var q = [];
                     q.push("SELECT to_char(created_at,'YYYYMMDD') as dt, count as ct");
                     q.push("FROM cable_ngram_weeks");
                     q.push("WHERE ngram = $1");
 
-                    dbClient.query(q.join(" "), [term], callback); 
+                    dbClient.query(q.join(" "), [term], callback);
                 }
             }(term);
 
             // Check and update the number of queries left
-            if(--limit == 0) break;  
-        }  
+            if(--limit == 0) break;
+        }
     }
 
     // Send all queries at the same time (maximum 3)
     async.parallel(queries, callback)
-    
+
 };
 
 /**
@@ -342,9 +347,9 @@ var getNgramByWeek = module.exports.getNgramByWeek = function(query, callback) {
  * @return {Array}      Rows transposed
  */
 var transposeToWeekCount = module.exports.transposeToWeekCount = function(rows) {
-    
+
     var all = _.map(module.exports.docCountByWeek, function(week) {
-        
+
         var data = {
              // Total number of document
             tt: week.ct,
@@ -354,13 +359,13 @@ var transposeToWeekCount = module.exports.transposeToWeekCount = function(rows) 
         var row = _.findWhere(rows, { dt: week.dt });
 
         if(row) {
-            // Total of occurences 
+            // Total of occurences
             data.ct = row.ct;
             // Part of occurence following the total of document
-            data.part = Math.round( (row.ct/data.tt)*100*1000 )/1000; 
-        } else {        
+            data.part = Math.round( (row.ct/data.tt)*100*1000 )/1000;
+        } else {
             // Total of occurences (equal to its part)
-            data.part = data.ct = 0;  
+            data.part = data.ct = 0;
         }
 
         return data;

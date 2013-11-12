@@ -30,7 +30,7 @@
     // An array of deactivated date ranges
     var deactivatedDateRanges = [
         { start: new Date(1975, 11, 1).getTime(), end: new Date(1975, 11, 15).getTime() },
-        { start: new Date(1976, 2, 8).getTime(), end: new Date(1976, 3, 5).getTime() },
+        { start: new Date(1976, 2, 8).getTime(),  end: new Date(1976, 3, 5).getTime() },
         { start: new Date(1976, 4, 25).getTime(), end: new Date(1976, 5, 7).getTime() }
     ];
     // -------------------------------------------------------------------------

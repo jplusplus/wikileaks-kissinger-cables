@@ -1,10 +1,10 @@
 (function(window, jQuery, undefined) {
     "use strict"
-    var map, mapData, mapDataKey, mapSlotSize, symbols, timer;
+    var map, mapData, mapDataKey, mapSlotSize, symbols, timer, isCityView = false;
     var $workspace, $form, $slider, $map, $sidebar, $backToWorld, $notice;
 
-    function createCountriesMap() {      
-        
+    function createCountriesMap() {
+
         // Stop auto-slide
         stopTimer();
         // Hides side bar
@@ -17,51 +17,51 @@
         // Show the right notice text
         $notice.removeClass("see-cities").addClass("see-countries");
 
-        map.loadMap(window.__root__ + 'data/wor.svg', function(m) {                          
+        map.loadMap(window.__root__ + 'data/wor.svg', function(m) {
             // Resize the map to fit corectly to its parent
-            resizeMap();  
+            resizeMap();
             // Set the map style/layers without lands layer
             defaultMapLayers(m, false);
             // Load the data once
             loadCountriesData();
             // Updates value using the slider
-            $slider.off("valuesChanging").on("valuesChanging", loadCountriesData);            
+            $slider.off("valuesChanging").on("valuesChanging", loadCountriesData);
         });
     }
 
-    function createRegionsMap(data, path) {    
-            
+    function createRegionsMap(data, path) {
+
         // Stop auto-slide
         stopTimer();
         // Remove existing qtips
         $(".qtip").remove();
 
         // shows back button
-        $backToWorld.removeClass("hide");        
+        $backToWorld.removeClass("hide");
         // Loading mode
         $workspace.addClass("loading");
         // Remove slot size to force data reload
         mapSlotSize = -1;
 
         // Get the country
-        var country = data.iso2 || data.lc;     
+        var country = data.iso2 || data.lc;
         // Nothing to do
-        if(!country) return     
+        if(!country) return
 
         // Show the right notice text
         $notice.removeClass("see-countries").addClass("see-cities");
 
-        map.loadMap(window.__root__ + "region/" + country + ".svg", function(m) {              
+        map.loadMap(window.__root__ + "region/" + country + ".svg", function(m) {
             // Resize the map to fit corectly to its parent
-            resizeMap();      
+            resizeMap();
             // Set the map style/layers with lands layer
             defaultMapLayers(m, true);
             // Load the data once
-            loadRegionsData(country);            
+            loadRegionsData(country);
             // Updates value using the slider
-            $slider.off("valuesChanging").on("valuesChanging", function() {                
+            $slider.off("valuesChanging").on("valuesChanging", function() {
                 // Load the data passing the country
-                loadRegionsData(country)
+                loadRegionsData(country);
                 // Disable loading mode
                 $workspace.removeClass("loading");
             });
@@ -69,18 +69,18 @@
     }
 
     function loadCountriesData() {
-
+        isCityView = false
         // Hides the sidebar
         $sidebar.addClass("hide");
 
-        var slotSize = getSlotSize();    
+        var slotSize = getSlotSize();
         // Did the slot size change ?
         if(slotSize != mapSlotSize) {
 
             mapSlotSize = slotSize;
-            var params = { slotSize: mapSlotSize };   
-            
-            $.getJSON(window.__root__ + "count/countries.json", params, updateMapSymbols);         
+            var params = { slotSize: mapSlotSize };
+
+            $.getJSON(window.__root__ + "count/countries.json", params, updateMapSymbols);
 
         // If not, just update the map
         } else {
@@ -89,18 +89,18 @@
     }
 
     function loadRegionsData(country) {
-
-        var slotSize = getSlotSize();        
+        isCityView = true
+        var slotSize = getSlotSize();
         // Did the slot size change ?
         if(slotSize != mapSlotSize) {
 
             mapSlotSize = slotSize;
-            var params = { 
+            var params = {
                 slotSize: mapSlotSize,
                 regionFrom: country
-            };   
-            
-            $.getJSON(window.__root__ + "count/cities.json", params, updateMapSymbols);         
+            };
+
+            $.getJSON(window.__root__ + "count/cities.json", params, updateMapSymbols);
 
         // If not, just update the map
         } else {
@@ -108,16 +108,16 @@
         }
     }
 
-    function loadCountrySidebar(place) {      
-        var country = place.cy || place.lc || place;        
-        var slideValues = $slider.dateRangeSlider("values");        
-        // Creates the parameters object 
+    function loadCountrySidebar(place) {
+        var country = place.cy || place.lc || place;
+        var slideValues = $slider.dateRangeSlider("values");
+        // Creates the parameters object
         var params = {
-            startYear : slideValues.min.getFullYear(), 
+            startYear : slideValues.min.getFullYear(),
             endYear   : slideValues.max.getFullYear(),
             country   : country
         };
-        
+
         // Stop auto-slide
         stopTimer();
 
@@ -135,24 +135,22 @@
 
     function getSlotSize() {
 
-        var values = $slider.dateRangeSlider("values");        
-        var months = (values.max.getFullYear() - values.min.getFullYear()) * 12;
-           months -= values.min.getMonth() + 1;
-           months += values.max.getMonth();
+        var values = $slider.dateRangeSlider("values");
+        var years = values.max.getFullYear() - values.min.getFullYear()
 
-        return (months <= 0 ? 0 : months) + 1;
+        return (years <= 0 ? 0 : years) + 1;
     }
 
     function createTooltip(meta) {
-        
+
         if(meta.iso2) {
-            meta = _.findWhere(mapData[mapDataKey], {lc: meta.iso2});                         
+            meta = _.findWhere(mapData[mapDataKey], {lc: meta.iso2});
         }
 
         if(meta) {
-            var city = meta.cy ? meta.lc + ", " : "",   
+            var city = meta.cy ? meta.lc + ", " : "",
             matches = "<br /><small>with <strong>%d</strong> occurrence(s)</small>".replace("%d", meta.ct);
-            return city + meta.label + matches; 
+            return city + meta.label + matches;
         } else {
             return false;
         }
@@ -162,29 +160,25 @@
 
         /**
          * Data strcuture:
-         *     * dt := date
+         *     * dt := year
          *     * ct := count
          *     * lt := latitude
          *     * lg := longitude
          *     * lc := location (city or country)
          *     * cy := country (optional)
          */
-        
+
         // Records data
         if(d) mapData = d;
-        
 
         var values = $slider.dateRangeSlider("values");
-        mapDataKey = values.min.getFullYear()+""+values.min.getMonth();  
-        console.log(values) 
+        mapDataKey = values.min.getFullYear();
 
         // Data we work with
         var data = mapData[mapDataKey] || [];
-        if(data.length == 0) return $workspace.removeClass("loading");        
-        
-        // The following assetion determines the mode:
-        // is the country in a separate field (city view) ?         
-        if(!! data[0].cy ) {
+        if(data.length == 0) return $workspace.removeClass("loading");
+
+        if(isCityView) {
 
             var scale = $K.scale.sqrt(data, 'ct').range([4, 30]);
 
@@ -205,14 +199,14 @@
                     return isNaN(r) ? 0 : r;
                 },
                 sortBy: 'radius desc',
-                style: function(place) {                    
+                style: function(place) {
                     return 'fill:#3194AA; stroke: #fff; fill-opacity: 0.6;'
                 },
                 click: loadCountrySidebar,
                 tooltip: createTooltip
             });
 
-        } else {  
+        } else {
 
             var colorscale = new chroma.ColorScale({
                 colors: ["#FFFFC6", "#CAE9AE", "#85CDBA", "#4DB6C6", "#327EBD", "#3194AA"],
@@ -221,22 +215,19 @@
 
             map.getLayer('countries').style({
                 fill: function(l, path) {
-
-                    var place = _.find(data, function(p) {      
-                        return p.lc === l.iso2;
-                    });     
+                    var place = data[l.iso2]
                     return place ? colorscale.getColor(place["ct"]) : "white"
                 }
             })
-            
+
             // Add tooltips
             .tooltips(createTooltip)
             // Add click event
             .on('click', createRegionsMap);
         }
-    
+
         // Keep the spinner until the disclaimer is close
-        if( ! $map.find(".disclaimer").is(":visible") ) {            
+        if( ! $map.find(".disclaimer").is(":visible") ) {
             // Removes loading mode
             $workspace.removeClass("loading");
         }
@@ -247,7 +238,7 @@
         // Checks that layers don't exist
         m.layer = m.layer || {};
 
-        if(widthLands) {            
+        if(widthLands) {
             m.layer['lands'] || m.addLayer('lands', {
                 name: 'lands',
                 styles: {
@@ -256,7 +247,7 @@
                     'stroke-width': 1,
                     'stroke-linejoin': 'round'
                 }
-            }); 
+            });
         }
 
 
@@ -280,31 +271,31 @@
         // Do not resize the map until the disclaimer is close
         if( $map.find(".disclaimer").is(":visible") ) return;
 
-        // var ratio = map.viewAB.width / map.viewAB.height;        
+        // var ratio = map.viewAB.width / map.viewAB.height;
         var ratio = 0.4,
            height = $map.width() * ratio;
-        
-        //var height = map.viewAB.height > $map.width() * 0.4 ? $map.width() * 0.4 : map.viewAB.height;                
+
+        //var height = map.viewAB.height > $map.width() * 0.4 ? $map.width() * 0.4 : map.viewAB.height;
         $map.height(height);
         map.resize();
     }
 
-    function closeDisclaimer() {   
+    function closeDisclaimer() {
         // Avoid to recalculate the map size for nothing
-        if( $map.find(".disclaimer").is(":visible") ) {            
-          
+        if( $map.find(".disclaimer").is(":visible") ) {
+
             $map.find(".disclaimer").addClass("hide");
             // Remove the spinner
             $workspace.removeClass("loading");
-            // We must resize the map without the disclaimer 
+            // We must resize the map without the disclaimer
             resizeMap();
         }
     }
 
-    function configure() { 
+    function configure() {
 
         if(!Modernizr.svg) return;
-        
+
           $workspace = $("#workspace");
                $form = $workspace.find("form.toolbox");
              $slider = $form.find(".date-slider");
@@ -313,7 +304,7 @@
              $notice = $(".notice");
         $backToWorld = $map.find(".js-back-to-world");
 
-        // Configure the tooltips        
+        // Configure the tooltips
         $.fn.qtip.defaults.style.classes = 'qtip-bootstrap';
         $.fn.qtip.defaults.style.def = false;
 
@@ -325,14 +316,14 @@
             arrows:false,
             valueLabels:'hide',
             bounds: {
-                min: new Date(1966,1,1), 
+                min: new Date(1966,1,1),
                 max: new Date(2010,1,1)
             },
             step: {
                 years:1
             },
             defaultValues:{
-                min: new Date(1966,1,1), 
+                min: new Date(1966,1,1),
                 max: new Date(1970,1,1)
             }
         });
@@ -340,8 +331,8 @@
 
         // Creates play timer
         timer = $.timer(function() {
-            
-            var slideValues = $slider.dateRangeSlider("values");            
+
+            var slideValues = $slider.dateRangeSlider("values");
             $slider.dateRangeSlider('scrollRight', 1);
 
             if( slideValues.max >= new Date(2010,1,1) ) {
@@ -350,7 +341,7 @@
 
         }, 1000);
 
-        map = $K.map( $map, $map.width(), $map.width()*0.4 );  
+        map = $K.map( $map, $map.width(), $map.width()*0.4 );
         // Adds countries to the map
         createCountriesMap();
 
@@ -358,7 +349,7 @@
         $(window).resize(resizeMap);
 
         // Launch the map animation
-        $form.delegate(".btn-play", "click", function(evt) {     
+        $form.delegate(".btn-play", "click", function(evt) {
 
             var slideValues = $slider.dateRangeSlider("values");
             $slider.dateRangeSlider('scrollRight', 1);
@@ -371,14 +362,14 @@
                 // Re-initialize the slider
                 $slider.dateRangeSlider("values", new Date(1966,1,1), new Date(1970,1,1));
             }
-         
+
             timer.toggle();
-            $form.find(".btn-play").toggleClass("pause", timer.isActive );                  
+            $form.find(".btn-play").toggleClass("pause", timer.isActive );
         });
 
         // Close the sidebar
         $sidebar.on("click", ".close-sidebar", function() {
-            $sidebar.addClass("hide");            
+            $sidebar.addClass("hide");
         });
 
         // Click on the "go to map" button

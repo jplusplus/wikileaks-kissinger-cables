@@ -16,9 +16,9 @@ module.exports = function(app) {
     app.get("/graph", diggIntoArchive);
 
     // Contextual routers
-    app.get(config.root + "play/sidebar", playTheHistorySidebar); 
+    app.get(config.root + "play/sidebar", playTheHistorySidebar);
     app.get(config.root + "map/sidebar", playTheHistorySidebar);
-    app.get("/play/sidebar", playTheHistorySidebar); 
+    app.get("/play/sidebar", playTheHistorySidebar);
     app.get("/map/sidebar", playTheHistorySidebar);
 
     // Data files
@@ -52,7 +52,7 @@ var playTheHistory =  module.exports.playTheHistory = function(req, res) {
  * @param  {Object} res Server result
  */
 var diggIntoArchive =  module.exports.diggIntoArchive = function (req, res) {
-    res.render("dive", { title: "Make Timegraph" });    
+    res.render("dive", { title: "Make Timegraph" });
 }
 
 /**
@@ -61,24 +61,24 @@ var diggIntoArchive =  module.exports.diggIntoArchive = function (req, res) {
  * @param  {Object} res Server result
  */
 var playTheHistorySidebar =  module.exports.playTheHistorySidebar = function(req, res) {
-    
+
     // Looks for the country
     var country = _.findWhere(data.countries, {iso_alph2_1970:req.query.country});
 
     // Gets events from freebase
     var events  = _.filter(data.freebaseEvents, function(ev) {
         // Events in the given date basket
-        return (  ( ev.start_date >= req.query.startYear && ev.start_date <= req.query.endYear )                
-               || ( ev.end_date   >= req.query.startYear && ev.end_date   <= req.query.endYear )                
-            ) && ( 
+        return (  ( ev.start_date >= req.query.startYear && ev.start_date <= req.query.endYear )
+               || ( ev.end_date   >= req.query.startYear && ev.end_date   <= req.query.endYear )
+            ) && (
                 // Do not take the indian cricket season (not related to india)
                 ev.name.toLowerCase().indexOf("indian cricket") == -1
-            ) && ( 
+            ) && (
 
                 // With the country in its name
                 ev.name.toUpperCase().indexOf( country.name.toUpperCase() ) > -1
                 // OR matching to the location
-                || ev.locations.indexOf(country.name) > -1 
+                || ev.locations.indexOf(country.name) > -1
             );
     });
 
@@ -91,16 +91,16 @@ var playTheHistorySidebar =  module.exports.playTheHistorySidebar = function(req
         ev.end_date   = new Date(ev.end_date).getFullYear();
 
         // Events in the given date basket
-        return (  ( ev.start_date >= req.query.startYear && ev.start_date <= req.query.endYear )                
-               || ( ev.end_date   >= req.query.startYear && ev.end_date   <= req.query.endYear )                
+        return (  ( ev.start_date >= req.query.startYear && ev.start_date <= req.query.endYear )
+               || ( ev.end_date   >= req.query.startYear && ev.end_date   <= req.query.endYear )
             ) && (
                 // It's a world event
-                ev.locations.indexOf("WORLD") > -1 
+                ev.locations.indexOf("WORLD") > -1
                 // With the country in its name
                 || ev.name.toUpperCase().indexOf( country.name.toUpperCase() ) > -1
                 // OR matching to the location
-                || ev.locations.indexOf(country.name) > -1 
-                || ev.locations.indexOf(req.query.country) > -1 
+                || ev.locations.indexOf(country.name) > -1
+                || ev.locations.indexOf(req.query.country) > -1
             );
     }));
 
@@ -115,12 +115,12 @@ var playTheHistorySidebar =  module.exports.playTheHistorySidebar = function(req
     searchUrl += "?q=" + escape(q);
     searchUrl += "&amp;qtfrom=" +  escape(req.query.startYear + "-01-01");
     searchUrl += "&amp;qtto=" +  escape(req.query.endYear + "-12-31");
-   
+
     res.render("play/sidebar", {
-        country   : country, 
-        startYear : req.query.startYear, 
+        country   : country,
+        startYear : req.query.startYear,
         endYear   : req.query.endYear == 1977 ? 1976 : req.query.endYear,
-        // Get the events for the given query    
+        // Get the events for the given query
         events    : events,
         searchUrl : searchUrl
     });
@@ -136,35 +136,35 @@ var playTheHistorySidebar =  module.exports.playTheHistorySidebar = function(req
  * @param  {Object} res Server result
  */
 var dataFile = module.exports.dataFile = function (req, res) {
-    
+
     var json = [],
     resource = req.params.resource;
-    
+
     // Get the data according the resource name
     switch(resource) {
-        
+
         case "ngrams":
-            return data.getNgramByWeek(req.query.q, function(err, result) {                
+            return data.getNgramByWeek(req.query.q, function(err, result) {
                 if(err) {
                     res.json({"error": err});
-                } else {             
-                    // Keep only the rows from the query                           
-                    for(var r in result) {                        
-                        // Transposes rows to week's docs count 
+                } else {
+                    // Keep only the rows from the query
+                    for(var r in result) {
+                        // Transposes rows to week's docs count
                         result[r] = data.transposeToWeekCount(result[r].rows);
                     }
                     // Return the data in JSON
                     res.json(result);
                 }
-            });          
+            });
             break;
 
         case "countries":
-            json = data.countriesByMonth;            
+            json = data.countriesByYear;
             break;
 
         case "cities":
-            json = data.citiesByMonth;            
+            json = data.citiesByYear;
             break;
 
         default:
@@ -176,21 +176,21 @@ var dataFile = module.exports.dataFile = function (req, res) {
     // Determines how many month are grouped by backet
     var slotSize = req.query.slotSize || 1;
 
-    if(req.query.regionFrom) {            
+    if(req.query.regionFrom) {
         // Find the region matching to the given place
-        var region = data.getRegionFromPlace(req.query.regionFrom);    
+        var region = data.getRegionFromPlace(req.query.regionFrom);
         // Filters using this region
-        if(region) {                    
+        if(region) {
             json = _.filter(json, function(l) {
                 return data.isInRegionFile(l.cy, region);
             });
         }
         // Append the region to the resource name (for cache key)
-        resource += "-" + region;   
+        resource += "-" + region;
     }
 
     // Aggregate the data
-    json = data.aggregateDocs(json, slotSize, resource);                     
+    json = data.aggregateDocs(json, slotSize, resource);
 
     // Return the data in JSON
     res.json(json);
@@ -203,7 +203,7 @@ var dataFile = module.exports.dataFile = function (req, res) {
  * @param  {Object} res Server result
  */
 var goToRegionfile = module.exports.goToRegionfile = function(req, res) {
-    
+
     // Get the country to look for
     var countryCode = (req.params.country || "").toUpperCase(),
            fileName = data.getRegionFromPlace(countryCode);
@@ -212,7 +212,7 @@ var goToRegionfile = module.exports.goToRegionfile = function(req, res) {
         res.redirect(config.root + "data/" + fileName);
     } else {
         res.send(404, 'Sorry, we cannot find that region!');
-    }    
+    }
 }
 
 
