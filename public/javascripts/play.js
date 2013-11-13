@@ -1,115 +1,81 @@
 (function(window, jQuery, undefined) {
     "use strict"
-    var map, mapData, mapDataKey, mapSlotSize, symbols, timer, isCityView = false;
-    var $workspace, $form, $slider, $map, $sidebar, $backToWorld, $notice;
+    var panZoom, mousePos, map, mapData, mapDataKey, mapSlotSize, symbols, timer, isCityView = false;
+    var $workspace, $form, $slider, $map, $sidebar, $notice, $toggleSymbols;
 
-    function createCountriesMap() {
-
+    function createMap() {
         // Stop auto-slide
         stopTimer();
         // Hides side bar
         $sidebar.addClass("hide");
-        // Hides back button
-        $backToWorld.addClass("hide");
         // Remove slot size to force data reload
         mapSlotSize = -1;
-
         // Show the right notice text
         $notice.removeClass("see-cities").addClass("see-countries");
-
+        // Load the world map
         map.loadMap(window.__root__ + 'data/wor.svg', function(m) {
             // Resize the map to fit corectly to its parent
             resizeMap();
             // Set the map style/layers without lands layer
-            defaultMapLayers(m, false);
+            defaultMapLayers(m);
             // Load the data once
-            loadCountriesData();
+            loadData();
             // Updates value using the slider
-            $slider.off("valuesChanging").on("valuesChanging", loadCountriesData);
+            $slider.off("valuesChanging").on("valuesChanging", loadData);
         });
     }
 
-    function createRegionsMap(data, path) {
+    function handleMousePosition(event) {
+        var parentOffset = $(this).offset();
+        event = event || window.event; // IE-ism
+        mousePos = {
+            x: event.pageX - parentOffset.left,
+            y: event.pageY - parentOffset.top
+        };
+    }
 
-        // Stop auto-slide
-        stopTimer();
-        // Remove existing qtips
-        $(".qtip").remove();
+    function getMousePosition() {
+        return mousePos;
+    }
 
-        // shows back button
-        $backToWorld.removeClass("hide");
-        // Loading mode
-        $workspace.addClass("loading");
-        // Remove slot size to force data reload
-        mapSlotSize = -1;
+    function loadData(callback) {
 
-        // Get the country
-        var country = data.iso2 || data.lc;
-        // Nothing to do
-        if(!country) return
+        var slotSize = getSlotSize();
+        // Did the slot size change ?
+        if(slotSize != mapSlotSize) {
 
-        // Show the right notice text
-        $notice.removeClass("see-countries").addClass("see-cities");
+            // Enable loading mode
+            $workspace.addClass("loading");
 
-        map.loadMap(window.__root__ + "region/" + country + ".svg", function(m) {
-            // Resize the map to fit corectly to its parent
-            resizeMap();
-            // Set the map style/layers with lands layer
-            defaultMapLayers(m, true);
-            // Load the data once
-            loadRegionsData(country);
-            // Updates value using the slider
-            $slider.off("valuesChanging").on("valuesChanging", function() {
-                // Load the data passing the country
-                loadRegionsData(country);
-                // Disable loading mode
-                $workspace.removeClass("loading");
+            mapSlotSize = slotSize;
+            var params  = { slotSize: mapSlotSize };
+            // Load the country
+            $.getJSON(window.__root__ + "count/countries.json", params, function(countries) {
+                // Load the cities
+                $.getJSON(window.__root__ + "count/cities.json", params, function(cities) {
+                    // Record the data
+                    mapData = {
+                        "countries": countries,
+                        "cities":    cities
+                    }
+                    // Draw them on the map
+                    updateMapSymbols();
+                    // Callback function
+                    if(typeof callback == "function") callback();
+                });
             });
-        });
-    }
-
-    function loadCountriesData() {
-        isCityView = false
-        // Hides the sidebar
-        $sidebar.addClass("hide");
-
-        var slotSize = getSlotSize();
-        // Did the slot size change ?
-        if(slotSize != mapSlotSize) {
-
-            mapSlotSize = slotSize;
-            var params = { slotSize: mapSlotSize };
-
-            $.getJSON(window.__root__ + "count/countries.json", params, updateMapSymbols);
 
         // If not, just update the map
         } else {
+            // Draw them on the map
             updateMapSymbols();
-        }
-    }
-
-    function loadRegionsData(country) {
-        isCityView = true
-        var slotSize = getSlotSize();
-        // Did the slot size change ?
-        if(slotSize != mapSlotSize) {
-
-            mapSlotSize = slotSize;
-            var params = {
-                slotSize: mapSlotSize,
-                regionFrom: country
-            };
-
-            $.getJSON(window.__root__ + "count/cities.json", params, updateMapSymbols);
-
-        // If not, just update the map
-        } else {
-            updateMapSymbols();
+            // Callback function
+            if(typeof callback == "function") callback();
         }
     }
 
     function loadCountrySidebar(place) {
-        var country = place.cy || place.lc || place;
+        var country = place.iso2 || place.cy || place.lc || place;
         var slideValues = $slider.dateRangeSlider("values");
         // Creates the parameters object
         var params = {
@@ -156,8 +122,7 @@
         }
     }
 
-    function updateMapSymbols(d) {
-
+    function updateMapSymbols() {
         /**
          * Data strcuture:
          *     * dt := year
@@ -168,25 +133,28 @@
          *     * cy := country (optional)
          */
 
-        // Records data
-        if(d) mapData = d;
+        // Get the map mode (cities or countries)
+        var what = getMapMode();
+        // Choose the right dataset (countries or cities)
+        var data = mapData[what];
 
         var values = $slider.dateRangeSlider("values");
         mapDataKey = values.min.getFullYear();
-
-        // Data we work with
-        var data = mapData[mapDataKey] || [];
+        // Data we work with (with year)
+        var data = data[mapDataKey] || [];
         if(data.length == 0) return $workspace.removeClass("loading");
 
-        if(isCityView) {
+        // Removes existing symbols
+        if(symbols) {
+            // Weird behavior : kartograph throw a warning when removing the symbols groups
+            map.removeSymbols();
+        }
 
-            var scale = $K.scale.sqrt(data, 'ct').range([4, 30]);
+        if(what == "cities") {
 
-            // Removes existing symbols
-            if(symbols) {
-                // Weird behavior : kartograph throw a warning when removing the symbols groups
-                map.removeSymbols();
-            }
+            var min   = _.min(data, function(e) { return e.ct }).ct
+            var max   = Math.max( _.max(data, function(e) { return e.ct }).ct, min+1)
+            var scale = $K.scale.linear([min, max]).range([4, 30]);
 
             symbols = map.addSymbols({
                 type: $K.Bubble,
@@ -200,31 +168,30 @@
                 },
                 sortBy: 'radius desc',
                 style: function(place) {
-                    return 'fill:#3194AA; stroke: #fff; fill-opacity: 0.6;'
+                    return 'fill:#e09d8d; stroke: #fff; fill-opacity: 0.6;'
                 },
                 click: loadCountrySidebar,
                 tooltip: createTooltip
             });
 
-        } else {
-
-            var colorscale = new chroma.ColorScale({
-                colors: ["#FFFFC6", "#CAE9AE", "#85CDBA", "#4DB6C6", "#327EBD", "#3194AA"],
-                limits: chroma.limits(data, 'equal', 100, "ct")
-            });
-
-            map.getLayer('countries').style({
-                fill: function(l, path) {
-                    var place = data[l.iso2]
-                    return place ? colorscale.getColor(place["ct"]) : "white"
-                }
-            })
-
-            // Add tooltips
-            .tooltips(createTooltip)
-            // Add click event
-            .on('click', createRegionsMap);
         }
+
+        var colorscale = new chroma.ColorScale({
+            colors: ["#FFFFC6", "#CAE9AE", "#85CDBA", "#4DB6C6", "#327EBD", "#3194AA"],
+            limits: chroma.limits(data, 'equal', 100, "ct")
+        });
+
+        map.getLayer('countries').style({
+            fill: function(l, path) {
+                var place = data[l.iso2]
+                return what == "countries" && place ? colorscale.getColor(place["ct"]) : "white"
+            }
+        })
+        // Add tooltips
+        .tooltips(createTooltip)
+        // Add click event
+        .on('click', loadCountrySidebar);
+
 
         // Keep the spinner until the disclaimer is close
         if( ! $map.find(".disclaimer").is(":visible") ) {
@@ -233,25 +200,11 @@
         }
     }
 
-    function defaultMapLayers(m, widthLands) {
+    function defaultMapLayers(m) {
 
         // Checks that layers don't exist
         m.layer = m.layer || {};
-
-        if(widthLands) {
-            m.layer['lands'] || m.addLayer('lands', {
-                name: 'lands',
-                styles: {
-                    stroke: '#aaaaaa',
-                    fill: '#dadada',
-                    'stroke-width': 1,
-                    'stroke-linejoin': 'round'
-                }
-            });
-        }
-
-
-         m.layer['countries'] || m.addLayer('countries', {
+        m.layer['countries'] || m.addLayer('countries', {
             name: 'countries',
             styles: {
                 stroke: '#aaa',
@@ -259,6 +212,10 @@
                 'stroke-width': 1
             }
         });
+
+
+        panZoom = m.paper.panzoom();
+        panZoom.enable();
     }
 
     function stopTimer() {
@@ -292,17 +249,27 @@
         }
     }
 
+    function getMapMode() {
+        return $toggleSymbols.is(":checked") ? "cities" : "countries"
+    }
+
     function configure() {
 
         if(!Modernizr.svg) return;
 
-          $workspace = $("#workspace");
-               $form = $workspace.find("form.toolbox");
-             $slider = $form.find(".date-slider");
-                $map = $("#map");
-            $sidebar = $("#sidebar");
-             $notice = $(".notice");
-        $backToWorld = $map.find(".js-back-to-world");
+            $workspace = $("#workspace");
+                 $form = $workspace.find("form.toolbox");
+               $slider = $form.find(".date-slider");
+                  $map = $("#map");
+              $sidebar = $("#sidebar");
+               $notice = $(".notice");
+        $toggleSymbols = $map.find(".js-toggle-symbols input");
+
+        // Track mouse position
+        $map.on("mousemove", handleMousePosition);
+
+        // Update map mode
+        $toggleSymbols.on("change", updateMapSymbols)
 
         // Configure the tooltips
         $.fn.qtip.defaults.style.classes = 'qtip-bootstrap';
@@ -324,7 +291,7 @@
             },
             defaultValues:{
                 min: new Date(1966,1,1),
-                max: new Date(1970,1,1)
+                max: new Date(1985,1,1)
             }
         });
 
@@ -343,7 +310,7 @@
 
         map = $K.map( $map, $map.width(), $map.width()*0.4 );
         // Adds countries to the map
-        createCountriesMap();
+        createMap();
 
         // Right map resizing
         $(window).resize(resizeMap);
@@ -360,7 +327,7 @@
             // Cursor at the end
             if( slideValues.max >= new Date(2010,1,1) ) {
                 // Re-initialize the slider
-                $slider.dateRangeSlider("values", new Date(1966,1,1), new Date(1970,1,1));
+                $slider.dateRangeSlider("values", new Date(1966,1,1), new Date(1985,1,1));
             }
 
             timer.toggle();
@@ -371,9 +338,6 @@
         $sidebar.on("click", ".close-sidebar", function() {
             $sidebar.addClass("hide");
         });
-
-        // Click on the "go to map" button
-        $map.on("click", ".js-back-to-world", createCountriesMap);
 
         // Close the disclaimer
         $map.find(".disclaimer .btn").on("click", closeDisclaimer);

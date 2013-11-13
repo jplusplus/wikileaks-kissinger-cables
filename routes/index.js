@@ -11,19 +11,18 @@ module.exports = function(app) {
 
     // Mains routers
     app.get(config.root + "map", playTheHistory);
-    app.get(config.root + "graph", diggIntoArchive);
     app.get("/map", playTheHistory);
+    app.get(config.root + "graph", diggIntoArchive);
     app.get("/graph", diggIntoArchive);
 
     // Contextual routers
-    app.get(config.root + "play/sidebar", playTheHistorySidebar);
     app.get(config.root + "map/sidebar", playTheHistorySidebar);
-    app.get("/play/sidebar", playTheHistorySidebar);
     app.get("/map/sidebar", playTheHistorySidebar);
 
     // Data files
     app.get("/count/:resource.json", dataFile);
     app.get(config.root + "count/:resource.json", dataFile);
+    app.get("/events.json", function(req, res) { res.json(data.events) });
     app.get(config.root + "events.json", function(req, res) { res.json(data.events) });
 
     // Right region file according a country code
@@ -74,7 +73,6 @@ var playTheHistorySidebar =  module.exports.playTheHistorySidebar = function(req
                 // Do not take the indian cricket season (not related to india)
                 ev.name.toLowerCase().indexOf("indian cricket") == -1
             ) && (
-
                 // With the country in its name
                 ev.name.toUpperCase().indexOf( country.name.toUpperCase() ) > -1
                 // OR matching to the location

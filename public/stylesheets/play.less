@@ -1,6 +1,6 @@
 
 .toolbox {
-    
+
     .btn-play {
         position:relative;
         cursor:pointer;
@@ -9,16 +9,16 @@
         width:40px;
         height:40px;
         margin-top:10px;
-        
-        background:@linkColorVariant;   
+
+        background:@linkColorVariant;
         .border-radius(50%);
-        
-        &:after, &:before {  
-            content:"";          
-            position:absolute;            
+
+        &:after, &:before {
+            content:"";
+            position:absolute;
         }
 
-            
+
         &:after {
             text-align:center;
             font-size:30px;
@@ -40,19 +40,19 @@
             top:50%;
             margin-left:(6px+10px)/-2px;
             margin-top:20px/-2px;
-        }   
-        
+        }
+
         &.pause {
-            
+
             background:@activeColor;
-            
+
             &:after {
                 display:none;
             }
             &:before {
                 display:block;
-            }    
-        } 
+            }
+        }
     }
 
     .ui-rangeSlider {
@@ -72,14 +72,14 @@
     position:absolute;
     bottom:140px;
     left:20px;
-    
+
     border:1px solid @toolboxBorder;
     background:@toolboxColor;
-    .box-shadow(0 0 10px 0 fade(black, 10%)); 
+    .box-shadow(0 0 10px 0 fade(black, 10%));
     font-weight:bold;
     text-transform:uppercase;
     text-align:center;
-    
+
     &:hover {
         .opacity(20);
     }
@@ -89,22 +89,22 @@
 
     &.see-cities .cities{ display:block }
     &.see-countries .countries { display:block }
-    
-    
+
+
 }
 
 
-.legend {          
+.legend {
     padding:10px;
     height:85px;
     width:240px;
-    
+
     &:hover {
         .opacity(20);
     }
 
-    h5 { 
-        padding:0; 
+    h5 {
+        padding:0;
         margin:0;
     }
 
@@ -116,7 +116,7 @@
     .gradient {
         border:1px solid @toolboxBorder;
         height:15px;
-        
+
         #gradient > .horizontal(#FFFFC6, @linkColorVariant);
     }
 
@@ -125,16 +125,16 @@
 #map {
     padding:0;
     width:auto;
-    
+
     position:relative;
-    z-index:60;    
+    z-index:60;
     overflow:hidden;
     border-bottom:1px solid @toolboxBorder;
-    
+
     svg {
-        max-width:auto;    
+        max-width:auto;
         position:relative;
-        
+
         &:before {
             content:"";
             position:absolute;
@@ -145,87 +145,86 @@
         }
     }
 
-    .legend {        
+    .legend {
         z-index:50;
         position:absolute;
         bottom:20px;
         left:20px;
         border:1px solid @toolboxBorder;
         background:@toolboxColor;
-        .box-shadow(0 0 10px 0 fade(black, 10%));         
+        .box-shadow(0 0 10px 0 fade(black, 10%));
     }
 
 
-    .js-back-to-world {        
-        z-index:50;   
+    .js-toggle-symbols {
+        z-index:50;
         position:absolute;
         top:0;
         right:0;
         background:@toolboxColor;
-        color:@linkColor;
-        height:40px;   
-        width:40px;
-        font-size:40px;
+        color:gray;
+        height:40px;
+        font-size:18px;
         line-height:40px;
-        text-align:center;  
+        padding:0 20px;
+        text-align:center;
         border:1px solid @toolboxBorder;
         border-top:0;
         border-right:0;
-        cursor:pointer;    
-        .box-shadow(0 0 10px 0 fade(black, 10%));   
-        .translate(0%, 0);         
+        cursor:pointer;
+        .box-shadow(0 0 10px 0 fade(black, 10%));
+        .translate(0%, 0);
         .transition(0.4s);
-        
-        .csstransforms &.hide {
-            display:block;
-            .box-shadow(0 0 20px 0 fade(black, 0%));
-            .translate(100%, 0);            
-        }    
+
+        input {
+            position:relative;
+            top:-2px;
+        }
     }
 
     .disclaimer {
-        
+
         @disclaimerWidth:400px;
-        
+
         font-size:16px;
-        z-index:110; 
+        z-index:110;
         position:relative;
-        
+
         width:@disclaimerWidth;
         padding:0;
         margin:auto;
         margin-bottom:20px;
         margin-top:30px;
-        max-width:80%;   
-        
+        max-width:80%;
+
         background:@toolboxColor;
-        border:1px solid @toolboxBorder;  
-        .box-shadow(0 0 10px 0 fade(black, 10%));   
-        
-        
+        border:1px solid @toolboxBorder;
+        .box-shadow(0 0 10px 0 fade(black, 10%));
+
+
         p {
             padding:10px 20px;
             padding-bottom:0;
         }
     }
-    
+
     #sidebar {
-        z-index:60;   
+        z-index:60;
         position:absolute;
         left:0%;
         right:auto;
         top:0;
         bottom:0;
         background:#fafafa;
-         
+
         .box-shadow(0 0 20px 0 fade(black, 20%));
-        .translate(0%, 0);        
+        .translate(0%, 0);
         .transition(0.4s);
-        
+
         .csstransforms &.hide {
             display:block;
             .box-shadow(0 0 20px 0 fade(black, 0%));
-            .translate(-101%, 0);            
+            .translate(-101%, 0);
         }
 
         // Pseudo right border, invisible in width:100%
@@ -249,8 +248,8 @@
             text-transform:uppercase;
             cursor:pointer;
             font-weight:bold;
-            
-            
+
+
             &:before {
                 content:"‹‹ ";
             }
@@ -274,39 +273,39 @@
                 padding:3%;
                 background:lighten(@linkColor, 50%);
                 border-bottom:1px solid white;
-                
+
                 h3 {
                     font-weight:normal;
                     line-height:1.2em;
                     margin-left:70px;
                     padding-left:3%;
-                    
+
                     em {
                         font-weight:bold;
                         font-style:normal;
                     }
                 }
 
-                .flag {                    
+                .flag {
                     position:absolute;
                     top:50%;
                     margin-top:-60px/2px;
                     width:70px;
                     height:60px;
                     overflow:hidden;
-                    
+
                     img {
                         height:auto;
                         width:auto;
                         max-width:auto;
                         max-height:auto;
                         min-width:70px;
-                        min-height:100%;       
-                                       
+                        min-height:100%;
+
                         position:absolute;
-                        left:50%;                 
+                        left:50%;
                         margin-left:-70px/2px;
-                    }                   
+                    }
                 }
             }
 
@@ -315,7 +314,7 @@
             }
 
             .events {
-                h4 {                    
+                h4 {
                     margin:3%;
                 }
 
@@ -323,7 +322,7 @@
                     padding:3%;
                     font-size:16px;
                     border-top:1px solid @toolboxBorder;
-                    
+
                     &:before {
                         content:"";
                         margin-right:5px;

@@ -8,38 +8,41 @@ block scripts
     script(src="#{root}javascripts/vendor/jquery.timer.js", type="text/javascript")
     script(src="#{root}javascripts/vendor/jquery.mousewheel.min.js", type="text/javascript")
     script(src="#{root}javascripts/vendor/jquery-ui.min.js", type="text/javascript")
-    script(src="#{root}javascripts/vendor/jQAllRangeSliders-min.js", type="text/javascript")        
+    script(src="#{root}javascripts/vendor/jQAllRangeSliders-min.js", type="text/javascript")
     script(src="#{root}javascripts/vendor/raphael-min.js", type="text/javascript")
     script(src="#{root}javascripts/vendor/underscore-min.js", type="text/javascript")
     script(src="#{root}javascripts/vendor/chroma.min.js", type="text/javascript")
     script(src="#{root}javascripts/vendor/kartograph.min.js", type="text/javascript")
+    script(src="#{root}javascripts/vendor/raphael.pan-zoom.js", type="text/javascript")
     script(src="#{root}javascripts/play.js", type="text/javascript")
 
 block prefix
     h3 Frequency of City and Country Mentions in US Diplomatic Cables
-    
+
 block content
     form.toolbox
         .row-fluid
             .span4
                 h3.hint Click PLAY to watch the map over the whole time period.
-                .hint You can move the cursor to find the number of times each country or city was mentioned for the selected date range.           
+                .hint You can move the cursor to find the number of times each country or city was mentioned for the selected date range.
             .span8.timeline
                 a.btn-play
                 .date-slider
-                    .calendar-grid  
-                        - for(var year=1966; year<=2010; year++)                    
+                    .calendar-grid
+                        - for(var year=1966; year<=2010; year++)
                             .year(class=getYearClass(year))
                                 .date-label
                                     =getYearLabel(year)
 
     #map
-        a.js-back-to-world.hide ⊖
+        label.js-toggle-symbols
+            input(type="checkbox", name="js-toggle-symbols").checkbox
+            span.left05 Display cities
         .row-fluid
             #sidebar.span5.hide
                 a.close-sidebar Close
                 .js-content
-                    
+
         .legend.hidden-phone
             h5 US State Department global interests
             p Frequency of references to cities and countries found in US cable traffic
@@ -48,12 +51,9 @@ block content
             .pull-right high
 
         .notice.see-countries.hidden-phone
-            .countries 
+            .countries
                 i.icon-hand-up.right10
-                | Click on a country to zoom in
-            .cities
-                i.icon-hand-up.right10
-                | Click on a city to find out more  
+                | Click to find out more
 
         .spinner Loading
         .disclaimer.hidden
