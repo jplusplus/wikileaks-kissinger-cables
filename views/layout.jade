@@ -34,16 +34,14 @@ html.no-js
             .fb-like(data-send="false",data-layout="button_count",data-width="100",data-show-faces="false", data-href=shareUrl)
 
         .sharespace.embed
-            input.input-block-level(type="text", value=getEmbed() )         
-        
+            input.input-block-level(type="text", value=getEmbed() )
+
         .prefix
             block prefix
 
         .tab-content
             .tab-pane.active
                 block content
-    
-    p.warning This tool only searches the Kissinger Cables (1973-1976) dataset
 
     #old-browser
         h4 You are using an <strong>outdated</strong> browser
@@ -54,7 +52,7 @@ html.no-js
     script(src="#{root}javascripts/vendor/bootstrap.min.js", type="text/javascript")
     script(src="#{root}javascripts/global.js", type="text/javascript")
     block scripts
-    
+
     div#fb-root
 
     script
@@ -66,7 +64,6 @@ html.no-js
             fjs.parentNode.insertBefore(js, fjs);
         }(document, 'script', 'facebook-jssdk'));
 
-    script 
+    script
         !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
 
-        
