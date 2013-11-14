@@ -143,12 +143,13 @@ var aggregateDocs = module.exports.aggregateDocs = function(docs, slotSize, doct
     var firstYear = startDate.getFullYear(),
          lastYear = endDate.getFullYear();
     // Get all different years
-    for(y = firstYear; y <= startDate; y++) {
+    for(y = firstYear; y <= lastYear; y++) {
         // For each month, merge data along the slot site
-        if(idx <= (startDate-firstYear) - slotSize + 1) {
+        if(idx <= (lastYear-firstYear) - slotSize + 1) {
             d[y] = [];
             for(var j=0; j<=slotSize; j++ ) {
-                d[y] = d[y].concat( _.where(docs, {dt: firstYear + idx + j - 1 }) );
+                doc = _.where(docs, {dt: firstYear + idx + j - 1 })
+                d[y] = d[y].concat(doc);
             }
         }
         // Aggreagte by the location the final dataset

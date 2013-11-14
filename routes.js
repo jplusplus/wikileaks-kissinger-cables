@@ -1,7 +1,7 @@
 // Dependencies
 var    _ = require("underscore"),
   config = require("config"),
-    data = require("../data")(); // Initialize data
+    data = require("./data")(); // Initialize data
 
 /**
  * Play page
