@@ -1183,7 +1183,8 @@ a{color:#3194aa;}a:hover{text-decoration:none;cursor:pointer;}
 .toolbox{overflow:hidden;border-bottom:1px solid #d7d7d7;padding:20px;background:#fafafa;margin:0;position:relative;z-index:40;-webkit-box-shadow:0 0 10px 0 rgba(0, 0, 0, 0.1);-moz-box-shadow:0 0 10px 0 rgba(0, 0, 0, 0.1);box-shadow:0 0 10px 0 rgba(0, 0, 0, 0.1);}.toolbox .hint{font-size:16px;}
 .toolbox h3.hint{margin:0;line-height:inherit;font-weight:bold;}
 .toolbox .timeline{margin-top:10px;float:left;}
-.calendar-grid{position:absolute;top:-8px;left:6px;right:6px;height:28px;white-space:nowrap;}.calendar-grid .year{position:relative;display:inline-block;height:100%;margin:0;padding:0;width:2.272727272727273%;height:50%;top:-25%;}.calendar-grid .year:before{position:absolute;content:"";top:0;left:-1px;width:1px;height:100%;background:#90d5e5;}
+.calendar-grid{position:absolute;top:-8px;left:6px;right:6px;height:28px;white-space:nowrap;}.calendar-grid.bottom-label .date-label{bottom:auto;top:100%;}
+.calendar-grid .year{position:relative;display:inline-block;height:100%;margin:0;padding:0;width:2.272727272727273%;height:50%;top:-25%;}.calendar-grid .year:before{position:absolute;content:"";top:0;left:-1px;width:1px;height:100%;background:#90d5e5;}
 .calendar-grid .year .date-label{position:absolute;display:block;bottom:100%;left:-25px;width:50px;color:#555555;text-align:center;font-size:70%;}
 .calendar-grid .year.decade{height:100%;top:0;}.calendar-grid .year.decade:before{width:3px;}
 .calendar-grid .year.decade .date-label{font-size:100%;}

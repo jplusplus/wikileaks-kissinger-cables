@@ -107,7 +107,8 @@ var playTheHistorySidebar =  module.exports.playTheHistorySidebar = function(req
 
     // Build the query
     var q = country.name;
-    if(country.iso_alph2_1970 == "SU") q += " USSR"
+    // Old patch for USSR code
+    // if(country.iso_alph2_1970 == "SU") q += " USSR"
 
     var searchUrl = config["search-engine"]["url"];
     searchUrl += "?q=" + escape(q);
@@ -142,14 +143,14 @@ var dataFile = module.exports.dataFile = function (req, res) {
     switch(resource) {
 
         case "ngrams":
-            return data.getNgramByWeek(req.query.q, function(err, result) {
+            return data.getNgramByMonth(req.query.q, function(err, result) {
                 if(err) {
                     res.json({"error": err});
                 } else {
                     // Keep only the rows from the query
                     for(var r in result) {
-                        // Transposes rows to week's docs count
-                        result[r] = data.transposeToWeekCount(result[r].rows);
+                        // Transposes rows to month's docs count
+                        result[r] = data.transposeToMonthCount(result[r].rows);
                     }
                     // Return the data in JSON
                     res.json(result);
@@ -173,19 +174,6 @@ var dataFile = module.exports.dataFile = function (req, res) {
 
     // Determines how many month are grouped by backet
     var slotSize = req.query.slotSize || 1;
-
-    if(req.query.regionFrom) {
-        // Find the region matching to the given place
-        var region = data.getRegionFromPlace(req.query.regionFrom);
-        // Filters using this region
-        if(region) {
-            json = _.filter(json, function(l) {
-                return data.isInRegionFile(l.cy, region);
-            });
-        }
-        // Append the region to the resource name (for cache key)
-        resource += "-" + region;
-    }
 
     // Aggregate the data
     json = data.aggregateDocs(json, slotSize, resource);

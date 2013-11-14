@@ -1,4 +1,4 @@
-(function(window, jQuery, undefined) {    
+(function(window, jQuery, undefined) {
     "use strict"
 
     // GLOBAL VARIABLES
@@ -10,7 +10,7 @@
       $types = $(".select-events-type"),
      $inspir = $(".need-inspiration a");
 
-    // Global data object and events 
+    // Global data object and events
     var  data = {}, events = [],
     // Visualization
           svg = null,
@@ -47,7 +47,7 @@
             d = function (s) { return decodeURIComponent(s.replace(a, " ")); },
             q = window.location.hash.substring(1);
 
-        while (e = r.exec(q)) {            
+        while (e = r.exec(q)) {
            hashParams[d(e[1])] = d(e[2]);
         }
 
@@ -61,8 +61,8 @@
      * @return {Boolean}   True if the data are defined
      */
     var isDefined = function(d) {
-        
-        var defined = true 
+
+        var defined = true
         $.each(deactivatedDateRanges, function(i, range) {
             if(defined) {
                 defined = d.dt <= range.start || d.dt >= range.end;
@@ -121,7 +121,7 @@
      * @param   {String}      String to parse
      * @type    {Function}
      */
-    var parseDate = d3.time.format("%Y%m%d").parse;
+    var parseDate = d3.time.format("%Y-%m").parse;
 
     /**
      * Find the index of the element matching to the given date
@@ -137,7 +137,7 @@
      * @param   {Date}      Date to format
      * @type    {Function}
      */
-    var formatDate = d3.time.format.utc("%Y-%m-%d%");
+    var formatDate = d3.time.format.utc("%Y-%m");
 
 
     /**
@@ -163,9 +163,9 @@
      * @return {Object} Sizes
      */
     function adjustSizes(redraw) {
-        
+
         // Calculates the graph sizes
-        //sizes.tolalEventsHeight = (sizes.eventHeight+sizes.eventMargin) * events.length                
+        //sizes.tolalEventsHeight = (sizes.eventHeight+sizes.eventMargin) * events.length
         //sizes.height  = sizes.graphHeight + sizes.tolalEventsHeight;
         //sizes.height += sizes.margin.top + sizes.margin.bottom;
         sizes.height  = sizes.graphHeight
@@ -192,8 +192,8 @@
      */
     function adjustRanges() {
         x.range([0, sizes.width]);
-        y.range([sizes.graphHeight, 0]);   
-        return sizes;     
+        y.range([sizes.graphHeight, 0]);
+        return sizes;
     }
 
     /**
@@ -208,10 +208,10 @@
 
         // Save data in the global namespace
         if(d) {
-            data =  _.map(d, function(values, ngram) {          
+            data =  _.map(d, function(values, ngram) {
                 // Prepare values items
-                var values = _.map(values, function(item) {     
-                    // Parse the given date    
+                var values = _.map(values, function(item) {
+                    // Parse the given date
                     item.dt = parseDate(item.dt);
                     return item;
                 });
@@ -223,15 +223,17 @@
             if(!data[0]) return;
         }
 
+
         // Colorize input tags
         $search.find(".tagsinput .tag").each(function(i) {
             var val = $(this).find("span").text().toUpperCase().trim();
             $(this).css("background-color", color( val ) );
         });
-     
-        // Use the first line to extend the X axis 
+
+        var dates = [new Date(1966, 1, 1), new Date(2010, 0, 1)]
+        // Use the first line to extend the X axis
         // (both datasets are the same on X)
-        x.domain(d3.extent(data[0].values, function(d) { return d.dt; }));
+        x.domain(dates);
 
         y.domain([
             d3.min(data, function(c) { return d3.min(c.values, function(v) { return v[indicator]; }); }),
@@ -243,7 +245,7 @@
         svg.selectAll("g").remove();
 
         // Creates Y Axis group
-        svg.append("g")                
+        svg.append("g")
                 .attr("class", "y axis")
                 // Create the axis
                 .call(yAxis);
@@ -259,7 +261,7 @@
             .attr("x1", 0).attr("x2", sizes.width)
             .attr("y1", y).attr("y2", y);
 
-    
+
         var ngram = svg.selectAll(".ngram")
             .data(data)
             .enter()
@@ -268,11 +270,11 @@
 
 
         ngram.append("path")
-            .attr("class", "line")                   
-            .attr("d", function(d) { return line(d.values); })                       
-            .style("stroke", function(d) {  
+            .attr("class", "line")
+            .attr("d", function(d) { return line(d.values); })
+            .style("stroke", function(d) {
                 return color(d.name);
-            });       
+            });
 
 
         var focus = svg.selectAll(".focus")
@@ -283,30 +285,30 @@
                     .style("display", "none");
 
         var focusRuler = focus.append("line")
-            .attr("class", "focusRuler")            
+            .attr("class", "focusRuler")
             .attr("x1", x).attr("x2", x)
             .attr("y1", -40).attr("y2", sizes.height);
 
 
         // Add gray rect on deactivated dates range
         var blank = svg.append("g")
-                        .attr("class", "blank")                
+                        .attr("class", "blank")
                         .selectAll(".blank")
                         .data(deactivatedDateRanges)
                         .enter()
                         .append("g")
                             .attr("class", "blank")
-                            .append("rect")                        
+                            .append("rect")
                                 .style("fill", "#eef")
                                 .style("opacity", 0.4)
                                 .attr("height", sizes.graphHeight)
-                                .attr("width", function(d) {                                
+                                .attr("width", function(d) {
                                     return x(d.end) - x(d.start);
                                 })
-                                .attr("x", function(d) {                                
+                                .attr("x", function(d) {
                                     return x(d.start);
                                 })
-                                .attr("y", function(d, index) {                                
+                                .attr("y", function(d, index) {
                                     return  0;
                                 })
 
@@ -316,9 +318,9 @@
             .attr("width", sizes.width)
             .attr("height", sizes.graphHeight)
             .on("mouseover", function() { focus.style("display", null); })
-            .on("mouseout", function() { 
+            .on("mouseout", function() {
                 $tip.addClass("hidden");
-                focus.style("display", "none"); 
+                focus.style("display", "none");
             })
             .on("mousemove", mousemove);
 
@@ -333,37 +335,38 @@
          * @param  {Object} ev Mouse event
          */
         function mousemove(ev) {
-            
+
             var date = x.invert(d3.mouse(this)[0]),
                   tx = d3.mouse(this)[0];
 
-            var content = ["<h4>" + formatDate(date) + "</h4>"];     
-            
-            if( ! isDefined({dt: date} )) {
-            
+            var content = ["<h4>" + formatDate(date) + "</h4>"];
+
+            if( ! isDefined({dt: date}) ) {
+
                 content.push("<p>")
                     content.push("Documents are missing for this period.")
                 content.push("</p>")
-                
+
             } else {
 
-                $.each(data, function(index, d) {   
-                    if(d) {            
-                        var val = bisectDate(d.values, date),                     
+                $.each(data, function(index, d) {
+                    if(d) {
+                        var val = bisectDate(d.values, date),
                              bg = color(d.name),
                            line = d.values[val];
+
                         content.push("<div class='clearfix top10'>");
                             content.push("<span class='label right10' style='background:" + bg + "'>");
                                 content.push(d.name);
                                 content.push("<span class='label label-inverse left10'>");
                                     content.push(line[indicator]);
                                     content.push("%");
-                                content.push("</span>");                        
-                            content.push("</span>");                        
+                                content.push("</span>");
+                            content.push("</span>");
                             content.push("<span class='pull-right'>");
                                 content.push( line["ct"] + " occurrence(s) through " + line["tt"] + " document(s)" );
-                            content.push("</span>");                        
-                        content.push("</div>");                        
+                            content.push("</span>");
+                        content.push("</div>");
                     }
                 });
             }
@@ -386,47 +389,47 @@
 
 
     /**
-     * Function to launh the research 
+     * Function to launh the research
      * @param  {Object|String} ev   Optional triggered event or string to search
      * @return {Boolean}            Always false to prevent IE bug
      */
     function launchSearch(ev) {
 
-        
+
         // Get the query to look for
-        var q = QueryString().q;             
+        var q = QueryString().q;
 
         // No more than 3 terms
         if(q && q.split(",").length > 3) {
-            $search.find(":input[name=q]").removeTag(ev);            
+            $search.find(":input[name=q]").removeTag(ev);
             // Alert the user
             return alert("No more than 3 terms!");
         }
 
         if(q != undefined ) {
             // Update tags input
-            $search.find("[name=q]").importTags(q);             
+            $search.find("[name=q]").importTags(q);
             // Loads the data
             d3.json(window.__root__ + "count/ngrams.json?q="+escape(q), drawGraph);
             // Updates the search engine link
-            var $link = $(".go-to-search a");            
+            var $link = $(".go-to-search a");
             $link.attr("href", $link.data("href") + "?q=" + escape( q.replace(/,/g, "+") ) );
-        } 
+        }
 
         return false;
     }
 
-    function updateHash() { 
-        
-        var q = $(this).val() || $search.find(":input[name=q]").val();        
+    function updateHash() {
 
-        if(q) {            
+        var q = $(this).val() || $search.find(":input[name=q]").val();
+
+        if(q) {
             // Update hashbang
             window.location.hash = '#q=' + q.toUpperCase();
         } else {
             // Empty hash
-            window.location.hash = '#q';            
-        }        
+            window.location.hash = '#q';
+        }
     }
 
     function loadEvents(callback) {
@@ -434,18 +437,18 @@
         $.getJSON(window.__root__ + "events.json", function(d) {
             // Parse dates
             events = _.map(d, function(ev) {
-                ev.start_date = new Date(ev.start_date); 
-                ev.end_date = new Date(ev.end_date); 
+                ev.start_date = new Date(ev.start_date);
+                ev.end_date = new Date(ev.end_date);
                 return ev;
-            });       
+            });
 
             // Sorts by date
             events = _.sortBy(events, function(ev) { return ev.start_date })
             // Finds the types
             var types = _.uniq( _.pluck(events, "type") );
-            
+
             // Add the new types to the form
-            $types.html("Event's categories: ");            
+            $types.html("Event's categories: ");
             $.each(types, function(index, type) {
                 var $label = $("<span/>").addClass("active type label").html(type);
                 $label.css("background-color", colorEvent(type) );
@@ -455,7 +458,7 @@
 
             // Position the form
             $types.css({
-                top: sizes.graphHeight + sizes.margin.bottom + sizes.margin.top                
+                top: sizes.graphHeight + sizes.margin.bottom + sizes.margin.top
             });
 
             return callback && callback(events);
@@ -469,20 +472,20 @@
 
         // Remove every events in the current graph
         svg.selectAll("g.events").remove();
-        
+
         // Only keep active events
-        var eventsFiltered = _.filter(events, function(ev) {            
+        var eventsFiltered = _.filter(events, function(ev) {
             return $types.find(".type.active").filter(function(idx, type) {
                 return $(type).data("type") == ev.type;
             }).length > 0;
         });
 
 
-        var ev = svg.append("g").attr("class", "events")                
+        var ev = svg.append("g").attr("class", "events")
                     .selectAll(".events")
                         .data(eventsFiltered)
                         .enter()
-                        .append("g").attr("class", "event")   
+                        .append("g").attr("class", "event")
                             .attr("transform", "translate(0," + sizes.eventsY + ")")
                             .append("a")
                                 .attr("xlink:href", function(d) {return d.url})
@@ -490,27 +493,27 @@
 
         var rect = ev.append("rect")
                         .attr("rx",3)
-                        .style("fill", function(d) { 
+                        .style("fill", function(d) {
                             return colorEvent(d.type)
                         })
                         .attr("height", sizes.eventHeight)
-                        .attr("width", function(d) {                                
+                        .attr("width", function(d) {
                             return Math.max(6, x(d.end_date)-x(d.start_date) );
                         })
-                        .attr("x", function(d) {                                
+                        .attr("x", function(d) {
                             return x(d.start_date);
                         })
-                        .attr("y", function(d, index) {                                
+                        .attr("y", function(d, index) {
                             return  + index * (sizes.eventHeight+sizes.eventMargin);
                         })
 
-        var label = ev.append("text")                        
-                        .attr("transform", function(d, index) { 
-                            
+        var label = ev.append("text")
+                        .attr("transform", function(d, index) {
+
                             var tx = Math.max(0, x(d.start_date) ),
                                 ty = index * (sizes.eventHeight+sizes.eventMargin);
 
-                            return "translate(" + tx + "," + ty + ")"; 
+                            return "translate(" + tx + "," + ty + ")";
                         })
                         .text(function(d) { return d.name })
                         .attr("x", 10)
@@ -526,11 +529,11 @@
     /**
      * Graph initialization
      */
-    (function init() {     
+    (function init() {
 
         if(!Modernizr.svg) return;
-        
-        (function() {   
+
+        (function() {
             // Adjust the graph sizes
             adjustSizes(false);
             adjustRanges();
@@ -555,18 +558,18 @@
 
             // Prevent submit event
             $search.on("submit", function(ev) {
-                ev.preventDefault();   
+                ev.preventDefault();
                 updateHash();
             })
 
             // Search form events
-            $(window).on('hashchange', function(e) {   
-                launchSearch(e);   
+            $(window).on('hashchange', function(e) {
+                launchSearch(e);
             })
 
             // Launch the search once
             if(!QueryString().q) updateHash();
-            else launchSearch(); 
+            else launchSearch();
 
             $inspir.on("click", function() {
                 var t = $(this).text();

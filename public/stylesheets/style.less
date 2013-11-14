@@ -17,24 +17,24 @@ body, html {
 
 a {
     color:@linkColorVariant;
-    &:hover { 
-        text-decoration:none; 
-        cursor:pointer; 
+    &:hover {
+        text-decoration:none;
+        cursor:pointer;
     }
 }
 
 #old-browser {
     z-index:500;
-    
+
     position:fixed !important;
     position:absolute;
-    top:0; bottom:0;    
+    top:0; bottom:0;
     right:0; left:0;
-    
+
     background:white;
     padding:10%;
     overflow:hidden;
-    
+
     display:none;
     .no-svg &, .no-canvas &, .no-js & { display:block; }
 }
@@ -59,8 +59,8 @@ a {
     text-align: center;
     font-family: sans-serif;
 
-    .button {        
-        margin: 5px;    
+    .button {
+        margin: 5px;
         margin-top: 3px;
         margin-bottom: 10px;
     }
@@ -70,7 +70,7 @@ a {
 .warning {
     font-weight:bold;
     text-align:center;
-    font-size: 16px; 
+    font-size: 16px;
 }
 
 
@@ -82,7 +82,7 @@ a {
     padding-right: 10px;
     margin-bottom:10px;
     font: 12px sans-serif;
-    
+
     h3 {
         text-align: center;
         font-weight: bold;
@@ -105,7 +105,7 @@ a {
         display: block;
         border: 1px solid #666;
     }
-    
+
     a:hover {
         background: #eee; /*#34BEED;*/
     }
@@ -121,8 +121,8 @@ a {
 
     .wide {
         text-align: justify;
-        a { 
-            width: auto; 
+        a {
+            width: auto;
             margin-right:5px;
         }
     }
@@ -154,7 +154,7 @@ a {
         font-size: 16px;
         padding: 10px;
         text-decoration: none;
-        margin: 5px 5px  0px 15px;        
+        margin: 5px 5px  0px 15px;
         min-width: 90px;
         display: inline-block;
     }
@@ -171,15 +171,15 @@ a {
     line-height:20px;
 }
 
-#workspace {    
+#workspace {
     margin:20px 20px;
-    
+
     .sharespace {
         position:relative;
         z-index:100;
         height:26px;
         max-width:220px;
-        
+
         float:right;
         text-align:center;
         padding:8px 0;
@@ -187,7 +187,7 @@ a {
         margin-left:20px;
         border-bottom:1px solid @toolboxBorder;
         .box-shadow(0 1px 0 0 fade(white, 40) );
-        
+
         @media (max-width: 767px) {
             max-width:none;
             margin-left:0px;
@@ -209,11 +209,11 @@ a {
             text-align:center;
             background:@white;
             line-height:45px;
-            text-shadow:1px 1px 0 white;           
-            
+            text-shadow:1px 1px 0 white;
+
             .translate(0,0);
             .opacity(100);
-            .transition(0.6s); 
+            .transition(0.6s);
         }
 
         .csstransforms &.embed:before {
@@ -222,7 +222,7 @@ a {
 
         &:hover:before {
             .translate(0, -100%);
-            .opacity(0);            
+            .opacity(0);
             @media (max-width: 767px) {
                 .translate(-100%, 0);
             }
@@ -232,24 +232,24 @@ a {
 
 .toolbox {
     overflow:hidden;
-    border-bottom:1px solid @toolboxBorder;    
+    border-bottom:1px solid @toolboxBorder;
     padding:20px;
     background:#fafafa;
-    margin:0;  
-    
-    position:relative;     
-    z-index:40;        
+    margin:0;
+
+    position:relative;
+    z-index:40;
     .box-shadow(0 0 10px 0 fade(black, 10%));
-    
+
     .hint {
         font-size:16px;
-    } 
+    }
 
-    h3.hint { 
+    h3.hint {
         margin:0;
         line-height:inherit;
         font-weight:bold;
-    } 
+    }
 
 
     .timeline {
@@ -263,29 +263,34 @@ a {
     top:-8px;
     left:6px;
     right:6px;
-    height:28px;      
+    height:28px;
     white-space:nowrap;
 
+    &.bottom-label .date-label {
+        bottom:auto;
+        top:100%;
+    }
+
     .year {
-        position:relative;    
+        position:relative;
         display:inline-block;
         height:100%;
         margin:0;
-        padding:0;                 
-        width:100%/44%;   
+        padding:0;
+        width:100%/44%;
         height:50%;
-        top:-25%;   
-        
+        top:-25%;
+
         &:before {
             position:absolute;
             content:"";
             top:0;
             left:-1px;
             width:1px;
-            height:100%;        
-            background:@linkColor;  
-        }   
-        
+            height:100%;
+            background:@linkColor;
+        }
+
         .date-label {
             position:absolute;
             display:block;
@@ -295,19 +300,19 @@ a {
             color:@gray;
             text-align:center;
             font-size:70%;
-        }                  
+        }
 
         &.decade {
             height:100%;
             top:0;
-            
-            &:before {     
+
+            &:before {
                 width:3px;
             }
 
             .date-label {
                 font-size:100%;
-            }                                     
+            }
         }
 
         &.odd .date-label {
@@ -320,36 +325,36 @@ a {
 .spinner {
 
     .hide-text();
-    
+
     background:fade(white, 90%);
     position:absolute;
     top:0;
     left:0;
     bottom:0;
     right:0;
-    
+
     z-index:100;
-    
+
     overflow:hidden;
     display:none;
     .loading & { display:block; }
-    
+
     &:after {
         content:"Loading...";
         position:absolute;
-        z-index:101;    
+        z-index:101;
         top:50%;
         left:0; right:0;
         text-align:center;
-        color:@gray;        
-        font-family:@sansFontFamily;       
+        color:@gray;
+        font-family:@sansFontFamily;
         font-size:16px;
     }
 }
 
 
 /*****
- * BOOTSTAP OVERLOAD 
+ * BOOTSTAP OVERLOAD
  *****/
 
 @media (max-width: 767px) {
@@ -365,10 +370,10 @@ a {
 .nav.nav-pills {
 
     margin-bottom:10px;
-    
+
     background-color: fade(@white, 90);
     .box-shadow(0 10px 10px 0 @white);
-    
+
     @media (max-width: 767px) {
         z-index:300;
         position:fixed;
@@ -381,35 +386,35 @@ a {
     li {
 
         margin-right:20px;
-        
+
         a {
             .border-radius(0);
             font-size:16px;
             line-height:20px;
-            color:#333333;      
+            color:#333333;
             .border-radius( 0px 0px 5px 5px );
             background:#eee;
             border-bottom:5px solid #ddd;
-            
+
             &:hover {
                 color:#fff;
-                background:#333333;            
+                background:#333333;
             }
-            
+
         }
     }
 
     li.active a {
         color:#fff;
-        background:rgb(142, 209, 224); 
-        border-bottom:5px solid rgb(84, 169, 188);     
-    }  
+        background:rgb(142, 209, 224);
+        border-bottom:5px solid rgb(84, 169, 188);
+    }
 }
-    
 
-.tab-pane {    
+
+.tab-pane {
     border:1px solid @toolboxBorder;
-    background:#fff;   
+    background:#fff;
     position:relative;
 }
 
