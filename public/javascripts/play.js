@@ -177,15 +177,19 @@
         }
 
         var colorscale = new chroma.ColorScale({
-            colors: ["#FFFFC6", "#CAE9AE", "#85CDBA", "#4DB6C6", "#327EBD", "#3194AA"],
+            colors: ["#FFFFCC", "#A1DAB4", "#41B6C4", "#2C7FB8", "#253494",  "#3194AA"],
             limits: chroma.limits(data, 'equal', 100, "ct")
         });
 
+
+        var fill = function(l, path) {
+            var place = data[l.iso2]
+            return what == "countries" && place ? colorscale.getColor(place["ct"]) : "#FFFFC6"
+        };
+
         map.getLayer('countries').style({
-            fill: function(l, path) {
-                var place = data[l.iso2]
-                return what == "countries" && place ? colorscale.getColor(place["ct"]) : "white"
-            }
+            fill: fill,
+            stroke: fill
         })
         // Add tooltips
         .tooltips(createTooltip)
@@ -204,6 +208,16 @@
 
         // Checks that layers don't exist
         m.layer = m.layer || {};
+
+        m.layer['lands'] || m.addLayer('countries', {
+            name: 'lands',
+            styles: {
+                stroke: '#9FB3B7',
+                fill: '#fff',
+                'stroke-width': 2
+            }
+        });
+
         m.layer['countries'] || m.addLayer('countries', {
             name: 'countries',
             styles: {
@@ -212,6 +226,7 @@
                 'stroke-width': 1
             }
         });
+
 
 
         panZoom = m.paper.panzoom();
