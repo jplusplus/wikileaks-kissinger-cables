@@ -62,7 +62,7 @@ var diggIntoArchive =  module.exports.diggIntoArchive = function (req, res) {
 var playTheHistorySidebar =  module.exports.playTheHistorySidebar = function(req, res) {
 
     // Looks for the country
-    var country = _.findWhere(data.countries, {iso_alph2_1970:req.query.country});
+    var country = _.findWhere(data.countries, {iso2:req.query.country});
 
     // Gets events from freebase
     var events  = _.filter(data.freebaseEvents, function(ev) {
@@ -108,7 +108,7 @@ var playTheHistorySidebar =  module.exports.playTheHistorySidebar = function(req
     // Build the query
     var q = country.name;
     // Old patch for USSR code
-    // if(country.iso_alph2_1970 == "SU") q += " USSR"
+    // if(country.iso2 == "SU") q += " USSR"
 
     var searchUrl = config["search-engine"]["url"];
     searchUrl += "?q=" + escape(q);

@@ -1,14 +1,14 @@
 .header
     .flag
         - if(typeof country.suppl != "undefined")
-            img(src="#{root}images/flags/" + country.iso_alph2_1970 + "-" +  country.suppl + ".gif",alt="country flag")
+            img(src="#{root}images/flags/" + country.iso2 + "-" +  country.suppl + ".gif",alt="country flag")
         - else
-            img(src="#{root}images/flags/" + country.iso_alph2_1970 + ".gif",alt="country flag")
+            img(src="#{root}images/flags/" + country.iso2 + ".gif",alt="country flag")
     if startYear === endYear
         h3 What happened in&nbsp;<em>#{country.name}</em><br />in&nbsp;<em>#{endYear}</em>?
     else
         h3 What happened in&nbsp;<em>#{country.name}</em><br />between <em>#{startYear}</em>&nbsp;and&nbsp;<em>#{endYear}</em>?
-    
+
 a(href=searchUrl, target="_parent").btn.btn-large.go-to-docs Launch a text search through the documents
 if events.length
     .events

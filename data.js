@@ -159,7 +159,7 @@ var aggregateDocs = module.exports.aggregateDocs = function(docs, slotSize, doct
         _.each(d[y], function(e) {
             code = e.lc || e.cy
             // Looks for the country
-            var country = _.findWhere(module.exports.countries, {iso_alph2_1970: code});
+            var country = _.findWhere(module.exports.countries, {iso2: code});
             e.label = country ? country.name : "";
             // Remove the date (already in the key)
             delete e.dt;
