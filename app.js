@@ -10,7 +10,7 @@ var express = require('express')
   , config  = require('config')
     , jade  = require('jade')
       , fs  = require('fs');
-  
+
 var app = express();
 
 app.configure(function(){
@@ -40,21 +40,21 @@ app.configure(function(){
 
 
   // Pass values too the templates
-  app.use(function(req, res, next) {          
-    res.locals.req = req;        
-    res.locals.root = config["root"]; 
+  app.use(function(req, res, next) {
+    res.locals.req = req;
+    res.locals.root = config["root"];
     // Add search URL
     res.locals.searchUrl = config["search-engine"]["url"];
     // URL to share
     res.locals.shareUrl = config["search-engine"]["url"] + req.path.substring(1);
-    
+
     // Create embed
     res.locals.getEmbed = function() {
       // Get the templaye from file
-      var tpl = fs.readFileSync( app.get('views') + "/embed.jade", "utf8");          
+      var tpl = fs.readFileSync( app.get('views') + "/embed.jade", "utf8");
       // Compiles the template function
-      var templateFn = jade.compile(tpl);   
-      // Returne the template parsed   
+      var templateFn = jade.compile(tpl);
+      // Returne the template parsed
       return templateFn({ url: config["search-engine"]["url"] + req.path.substring(1) + "?no-menu=1" });
     };
 
@@ -65,7 +65,7 @@ app.configure(function(){
       return classes.join(" ")
     }
 
-    res.locals.getYearLabel = function(year) {      
+    res.locals.getYearLabel = function(year) {
       if(year%10 == 0) return year
       else return String(year/100).split(".")[1]
     }
@@ -84,9 +84,9 @@ app.configure(function(){
 app.configure('development', function(){
   app.use(express.errorHandler());
 });
-;
+
 http.createServer(app).listen(app.get('port'), function(){
   // Creates routes explicitely
   routes(app);
-  console.log("Express server listening on port " + app.get('port'));  
+  console.log("Express server listening on port " + app.get('port'));
 });

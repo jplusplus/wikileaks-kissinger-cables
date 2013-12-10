@@ -15,7 +15,7 @@
     // Visualization
           svg = null,
     // Indicator attrbute
-    indicator = "part",
+    indicator = "ct",
     // Graph sizes
     sizes = {
         margin : {top: 60, right: 40, bottom: 10, left: 40},

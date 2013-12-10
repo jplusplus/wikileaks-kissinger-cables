@@ -15,29 +15,18 @@ module.exports = function() {
 
     var dataDir = "./public/data/";
 
-    // Get data from JSON files
-    module.exports.docCountByMonth   = require(dataDir + "doc_count_by_week.json");
-
-    // Get data from CSV files
-    csv().from(dataDir + "countries_by_month.csv", { columns: ["dt","ct", "lc", "lt", "lg"] })
-            .transform(dateStringToYear)
+    csv().from(dataDir + "count_by_month.csv", { columns: ["ct","dt"] })
+            .transform(dateStringToStr)
             .to.array(function(data) {
-                module.exports.countriesByMonth = convertCoord(data);
-                console.log("%d countries/count by month extracted from file.", data.length)
+                module.exports.docCountByMonth = data;
+                console.log("%d doc/count by month extracted from file.", data.length)
             });
 
-    csv().from(dataDir + "countries_by_year.csv", { columns: ["dt","ct", "lc", "lt", "lg"] })
+    csv().from(dataDir + "countries_by_year.csv", { columns: ["dt","ct", "lc"] })
             .transform(dateStringToYear)
             .to.array(function(data) {
                 module.exports.countriesByYear = convertCoord(data);
                 console.log("%d countries/count by year extracted from file.", data.length)
-            });
-
-    csv().from(dataDir + "cities_by_month.csv", { columns: ["dt","ct", "lc", "lt", "lg", "cy"] })
-            .transform(dateStringToYear)
-            .to.array(function(data) {
-                module.exports.citiesByMonth = convertCoord(data);
-                console.log("%d cities/count by month extracted from file.", data.length)
             });
 
     csv().from(dataDir + "cities_by_year.csv", { columns: ["dt","ct", "lc", "lt", "lg", "cy"] })
@@ -97,6 +86,12 @@ module.exports = function() {
 
 var dateStringToYear = function(row, index) {
     row.dt = new Date(row.dt).getFullYear();
+    return row;
+}
+
+var dateStringToStr = function(row, index) {
+    row.dt = new Date(row.dt);
+    row.dt = row.dt.getFullYear() + "-" + row.dt.getMonth();
     return row;
 }
 
@@ -252,12 +247,25 @@ var getNgramByMonth = module.exports.getNgramByMonth = function(query, callback)
             queries[term] = function(term)  {
                 return function(callback) {
 
-                    var q = [];
+                    /* var q = [];
                     q.push("SELECT to_char(created_at,'YYYYMMDD') as dt, count as ct");
                     q.push("FROM cable_ngram_months");
                     q.push("WHERE ngram = $1");
 
-                    dbClient.query(q.join(" "), [term], callback);
+                    dbClient.query(q.join(" "), [], callback);*/
+
+                    d = []
+                    for(var y = 1966; y <= 2010; y++) {
+                        for(var m = 1; m <= 12; m++) {
+                            var dt = y + "-" + m;
+                            d.push({
+                                dt: dt,
+                                ct: ~~(Math.cos(y)*1000)
+                            })
+                        }
+                    }
+
+                    callback(null, {rows: d});
 
                 }
             }(term);
@@ -282,14 +290,14 @@ var transposeToMonthCount = module.exports.transposeToMonthCount = function(rows
     // Dateset bounds
     for(year = startDate.getFullYear(); year <= endDate.getFullYear(); year++) {
         for(month = 0; month < 12; month++) {
-            dt  = new Date(year, month, 1)
+            dt  = year + "-" + month
             // Do not outisde the date range
-            if(dt >= startDate && dt <= endDate) {
+            if(year >= startDate.getFullYear() && year <= endDate.getFullYear() ) {
+
                 var row = _.find(rows, function(r) {
-                    var d = new Date(r.dt);
-                    return d.getFullYear() == dt.getFullYear() && d.getMonth() == dt.getMonth()
+                    return r.dt == dt
                 }),
-                   part = _.find(module.exports.docCountByMonth, function(m) { return m.dt == dt.getTime()/1000 }),
+                   part = _.find(module.exports.docCountByMonth, function(m) { return m.dt == dt }),
                    data = { dt: year + "-" + month, tt: 0, ct: 0, part: 0 };
 
                 if(row) data.ct = 1*row.ct;
