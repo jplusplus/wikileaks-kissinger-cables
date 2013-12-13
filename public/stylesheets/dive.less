@@ -1,11 +1,11 @@
 
 .toolbox {
-    
-    .need-inspiration {     
+
+    .need-inspiration {
         position:absolute;
         right:0;
-        top:0; bottom:0;   
-        border-left:1px solid @toolboxBorder;   
+        top:0; bottom:0;
+        border-left:1px solid @toolboxBorder;
         padding:20px;
         padding-left:30px;
         background:darken(@toolboxColor, 1%);
@@ -13,17 +13,17 @@
         .csstransforms &:before {
             content:"";
             position:absolute;
-            
+
             top:50%;
             left:-34px/2px;
-            
-            border:1px solid @toolboxBorder;   
+
+            border:1px solid @toolboxBorder;
             border-top:0;
             border-right:0;
-            
+
             height:30px;
             width:30px;
-            
+
             margin-top:-30px/2px;
             background:inherit;
             .rotate(45deg)
@@ -39,37 +39,37 @@
 }
 
 #trends {
-    
+
     padding:0;
     width:auto;
     min-height:100px;
     position:relative;
-    z-index:60;    
+    z-index:60;
     overflow:hidden;
-    
-    .y .label {        
+
+    .y .label {
         font: 10px sans-serif;
     }
-    
-    .select-events-type {  
 
-        border:1px solid @toolboxBorder;   
+    .select-events-type {
+
+        border:1px solid @toolboxBorder;
         background:darken(@toolboxColor, 1%);
-        .box-shadow(0 0 10px 0 fade(black, 10%));        
+        .box-shadow(0 0 10px 0 fade(black, 10%));
         padding:10px 10px;
         margin:30px 40px;
 
         position:absolute;
-        top:0;        
+        top:0;
         line-height:1.6em;
-                
-        .type {            
+
+        .type {
             margin-right:10px;
             font-size:1em;
             padding:3px 6px;
             cursor:pointer;
             .opacity(40);
-            
+
             &.active {
                 .opacity(100);
             }
@@ -81,9 +81,9 @@
     }
 }
 
-.calendar-grid {
-    left:0;
-    right:0;
+#trends .calendar-grid {
+    left:6px;
+    right:20px;
 }
 
 .tip {
@@ -91,14 +91,14 @@
     top:0;
     left:0;
     z-index:100;
-    
+
     margin:0 30px;
 
     background:white;
     padding:20px;
-    .box-shadow(0 0 2px 0 fade(black, 10%) );    
+    .box-shadow(0 0 2px 0 fade(black, 10%) );
     border:1px solid @toolboxBorder;
-    
+
     &:before {
         content:"";
         position:absolute;
@@ -112,19 +112,23 @@
         border-top:0;
         border-right:0;
         .rotate(45deg);
-        .box-shadow(-1px 1px  1px 0 fade(black, 5%) );  
-                
+        .box-shadow(-1px 1px  1px 0 fade(black, 5%) );
+
     }
 
     &.right:before {
         .rotate(225deg);
-        left:auto; right:-1px;            
-    }          
+        left:auto; right:-1px;
+    }
 }
 
 /* Graph */
+line {
+    shape-rendering: crispEdges;
+}
+
 .axis {
-    
+
     text {
         fill:#555555;
     }
@@ -134,20 +138,20 @@
         stroke: @linkColor;
         stroke-width:3px;
         shape-rendering: crispEdges;
-        display:none;        
+        display:none;
     }
 }
 
-.ruler line {        
+.ruler line {
     shape-rendering: crispEdges;
-    stroke:fade(@linkColor, 10);   
-    stroke-width:1px;                   
+    stroke:fade(@linkColor, 10);
+    stroke-width:1px;
 }
 
 .line {
   fill: none;
   stroke: steelblue;
-  stroke-width: 1.5px;  
+  stroke-width: 1.5px;
 }
 
 .overlay {
@@ -157,9 +161,10 @@
 
 .focus line {
     shape-rendering: crispEdges;
-    stroke:@linkColor;   
-    stroke-width:1px;    
+    stroke:@linkColor;
+    stroke-width:1px;
 }
+
 
 
 .events {

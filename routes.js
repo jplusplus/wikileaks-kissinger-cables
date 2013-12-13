@@ -150,7 +150,7 @@ var dataFile = module.exports.dataFile = function (req, res) {
                     // Keep only the rows from the query
                     for(var r in result) {
                         // Transposes rows to month's docs count
-                        result[r] = data.transposeToMonthCount(result[r].rows);
+                        result[r] = data.transposeToMonthCount(result[r]);
                     }
                     // Return the data in JSON
                     res.json(result);

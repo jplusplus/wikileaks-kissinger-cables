@@ -8,7 +8,7 @@ freebase = require("freebase"),
      csv = require("csv"),
    cache = require('memory-cache');
 
-var startDate = new Date(1966, 1, 1),
+var startDate = new Date(1966, 0, 1),
       endDate = new Date(2010, 1, 1);
 
 module.exports = function() {
@@ -18,7 +18,13 @@ module.exports = function() {
     csv().from(dataDir + "count_by_month.csv", { columns: ["ct","dt"] })
             .transform(dateStringToStr)
             .to.array(function(data) {
-                module.exports.docCountByMonth = data;
+
+                module.exports.docCountByMonth = _.map(data, function(c) {
+                    dt   = c.dt.split('-')
+                    c.dt = dt[0] + (dt[1] < 10 ? "-0" : "-") + dt[1]
+                    return c;
+                });
+
                 console.log("%d doc/count by month extracted from file.", data.length)
             });
 
@@ -48,20 +54,6 @@ module.exports = function() {
                 module.exports.events = data;
                 console.log("%d events extracted from file.", data.length)
             });
-
-
-    // Doc count must be date-formated
-    module.exports.docCountByWeek   = _.map(module.exports.docCountByWeek, function(c) {
-        c.dt = new Date( (c.dt)*1000);
-        // Database rows have the date format YYYYMMDD
-        // We must convet the week's date
-        var dt = [ c.dt.getFullYear() ]
-        // Two digits format
-        dt.push( ("0" + ( 1*c.dt.getMonth() + 1) ).slice(-2) );
-        dt.push( ("0" + c.dt.getDate()).slice(-2) );
-        c.dt = dt.join("");
-        return c;
-    });
 
 
     // Every events recorded from Freebase
@@ -246,26 +238,41 @@ var getNgramByMonth = module.exports.getNgramByMonth = function(query, callback)
             // Create a closure function
             queries[term] = function(term)  {
                 return function(callback) {
-
-                    /* var q = [];
-                    q.push("SELECT to_char(created_at,'YYYYMMDD') as dt, count as ct");
-                    q.push("FROM cable_ngram_months");
-                    q.push("WHERE ngram = $1");
-
-                    dbClient.query(q.join(" "), [], callback);*/
-
-                    d = []
-                    for(var y = 1966; y <= 2010; y++) {
-                        for(var m = 1; m <= 12; m++) {
-                            var dt = y + "-" + m;
-                            d.push({
-                                dt: dt,
-                                ct: ~~(Math.cos(y)*1000)
-                            })
+                    // Requests the database twice
+                    async.parallel({
+                        'ps': function(done){
+                            var q = [];
+                            q.push("SELECT to_char(created_at,'YYYY-MM') as dt, count as ct");
+                            q.push("FROM cable_ngram_months_ps");
+                            q.push("WHERE ngram = $1");
+                            dbClient.query(q.join(" "), [term], done);
+                        },
+                        'cg': function(done) {
+                            var q = [];
+                            q.push("SELECT to_char(created_at,'YYYY-MM') as dt, count as ct");
+                            q.push("FROM cable_ngram_months_cg");
+                            q.push("WHERE ngram = $1");
+                            dbClient.query(q.join(" "), [term], done);
                         }
-                    }
+                    // Merge the two dataset
+                    }, function(error, data) {
+                        // or stop of error
+                        if(error) return callback(error, null)
+                        // Merge the two dataset
+                        var merge  = data.cg.rows.concat(data.ps.rows);
+                        // Group items by date
+                        var groups = _.groupBy(merge, function(d) { return d.dt });
+                        var sums = _.map(groups, function(group, dt) {
+                            // Sums the value
+                            sum = _.reduce(group, function (previous, a) {
+                                return a.ct + previous;
+                            }, 0);
+                            return { ct: sum, dt: dt }
+                        });
+                        // Callback function
+                        callback(null, sums)
+                    })
 
-                    callback(null, {rows: d});
 
                 }
             }(term);
@@ -290,7 +297,12 @@ var transposeToMonthCount = module.exports.transposeToMonthCount = function(rows
     // Dateset bounds
     for(year = startDate.getFullYear(); year <= endDate.getFullYear(); year++) {
         for(month = 0; month < 12; month++) {
-            dt  = year + "-" + month
+
+            date = new Date(year, month, 1)
+            if(date <= startDate || date >= endDate) continue
+
+            month = (month < 10 ? "0" : "")  + month
+            dt    = year + "-" + month
             // Do not outisde the date range
             if(year >= startDate.getFullYear() && year <= endDate.getFullYear() ) {
 

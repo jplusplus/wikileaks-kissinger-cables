@@ -15,11 +15,11 @@
     // Visualization
           svg = null,
     // Indicator attrbute
-    indicator = "ct",
+    indicator = "part",
     // Graph sizes
     sizes = {
         margin : {top: 60, right: 40, bottom: 10, left: 40},
-        graphHeight : 250,
+        graphHeight : 280,
         width  : 0,
         height : 0,
         eventsY : 0,
@@ -28,11 +28,11 @@
         eventFontSize : "0.85em"
     };
     // An array of deactivated date ranges
-    var deactivatedDateRanges = [
-        { start: new Date(1975, 11, 1).getTime(), end: new Date(1975, 11, 15).getTime() },
-        { start: new Date(1976, 2, 8).getTime(),  end: new Date(1976, 3, 5).getTime() },
-        { start: new Date(1976, 4, 25).getTime(), end: new Date(1976, 5, 7).getTime() }
-    ];
+    var deactivatedDateRanges = [];
+    var psRanges = {
+        start: new Date(1973, 0, 1),
+        end:   new Date(1976, 10, 31)
+    };
     // -------------------------------------------------------------------------
 
     /**
@@ -97,7 +97,7 @@
      */
     var line = d3.svg
         .line().interpolate("basis")
-            .defined(isDefined)
+            //.defined(isDefined)
             .x(function(d) { return x(d.dt); })
             .y(function(d) { return y(d[indicator]); });
 
@@ -152,7 +152,7 @@
         // Create a new one in the graph space
         return d3.select(graph).append("svg")
             .attr("width", sizes.width + sizes.margin.left + sizes.margin.right)
-            .attr("height", sizes.height)
+            .attr("height", sizes.height + sizes.margin.bottom)
             .append("g")
                 .attr("transform", "translate(" + sizes.margin.left + "," + sizes.margin.top + ")");
     }
@@ -196,6 +196,38 @@
         return sizes;
     }
 
+    function getDeactivated(data) {
+        var ranges   = []
+        var range    = {}
+        var previous = null
+
+        // Sort the dataset by date
+        data = _.sortBy(data, function(i){ return i.dt });
+        // Prepare values items
+        _.each(data, function(item) {
+
+            if(previous == null && item.tt == 0) {
+                // Create a new range
+                range["start"] = item.dt
+                // Save this item for the next iteration
+                previous = item
+            } else if(previous != null && item.tt > 0) {
+                // Close the current range
+                range["end"] = item.dt
+                // Only pick range bigger than 2 months
+                if(range.end.getTime() - range.start.getTime() > 60*60*24*31*2*1000) {
+                    // Add the range to the list
+                    ranges.push(range)
+                }
+                // Set previous to null to start looking for a new range
+                previous = null
+                range = {}
+            }
+        })
+
+        return ranges
+    }
+
     /**
      * Create the graph using the given data
      * @param  {Object} error Equals null if no error
@@ -221,6 +253,8 @@
 
             // Not readable data
             if(!data[0]) return;
+            // Generate deactivated date ranges
+            deactivatedDateRanges = getDeactivated(data[0].values)
         }
 
 
@@ -299,8 +333,8 @@
                         .append("g")
                             .attr("class", "blank")
                             .append("rect")
-                                .style("fill", "#eef")
-                                .style("opacity", 0.4)
+                                .style("fill", "#aaa")
+                                .style("opacity", 0.1)
                                 .attr("height", sizes.graphHeight)
                                 .attr("width", function(d) {
                                     return x(d.end) - x(d.start);
@@ -329,6 +363,36 @@
         // Add events on the graph
         drawEvents();
 
+        // Draw a small line under PS's range
+        var lineData = [
+            { x: x(psRanges.start),   y: y(0)+5 },
+            { x: x(psRanges.start),   y: y(0)+10 },
+            { x: x(psRanges.end),     y: y(0)+10 },
+            { x: x(psRanges.end),     y: y(0)+5 }
+        ]
+
+        var lineFunction = d3.svg.line()
+            .x(function(d) { return d.x; })
+            .y(function(d) { return d.y; })
+            .interpolate("linear");
+
+        var psRangeLabel = svg.append("g")
+
+        psRangeLabel
+            .append("path")
+                .attr("d", lineFunction(lineData))
+                .attr("stroke", "#222")
+                .attr("stroke-width", 1)
+                .attr("fill", "none")
+
+        psRangeLabel
+            .append("text")
+                .text("Kissinger Cables")
+                .attr("x", x(psRanges.start) )
+                .attr("y", y(0)+22 )
+                .attr("font-family", "sans-serif")
+                .attr("font-size", "10px")
+                .attr("fill", "#333");
 
         /**
          * Local mousemove function to create a tooltip and and a ruler
