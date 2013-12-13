@@ -1,6 +1,6 @@
 (function(window, jQuery, undefined) {
     "use strict"
-    var panZoom, mousePos, map, mapData, mapDataKey, mapSlotSize, symbols, timer, isCityView = false;
+    var cache = {}, panZoom, mousePos, map, mapData, mapSlotSize, symbols, timer, isCityView = false;
     var $workspace, $form, $slider, $map, $sidebar, $notice, $toggleSymbols;
 
     function createMap() {
@@ -43,7 +43,8 @@
         var slotSize = getSlotSize();
         // Did the slot size change ?
         if(slotSize != mapSlotSize) {
-
+            // Reset cache
+            cache = {}
             // Enable loading mode
             $workspace.addClass("loading");
 
@@ -110,7 +111,8 @@
     function createTooltip(meta) {
 
         if(meta.iso2) {
-            meta = _.findWhere(mapData[mapDataKey], {lc: meta.iso2});
+            var year = getMapYear()
+            meta = _.findWhere(mapData[year], {lc: meta.iso2});
         }
 
         if(meta) {
@@ -120,6 +122,54 @@
         } else {
             return false;
         }
+    }
+
+    function getMapYear() {
+        return $slider.dateRangeSlider("values").min.getFullYear()
+    }
+
+    function getData(what, year) {
+        var key = year + "-" + what;
+        if(cache[key]) return cache[key];
+        // Preload the next years
+        if(year < 2010) getData(what, year+1);
+        // Get the map mode (cities or countries)
+        var what = getMapMode();
+        // Choose the right dataset (countries or cities)
+        var data = mapData[what];
+        // Data we work with (with year)
+        var rows = data[year] || {};
+
+        var max = Math.max( _.max(rows, function(e) { return e.ct }).ct, 1)
+        // Remove too tiny data according max value
+        rows = _.filter(rows, function(e) { return e.ct > (max*0.01) })
+        // Deduce the minimum value
+        var min   = _.min(rows, function(e) { return e.ct }).ct
+        var objs  = {}
+        // Flatten this array
+        _.each(rows, function(e) {
+            objs[e.lc] = e
+        })
+
+        if(what == 'cities') {
+            var scale = $K.scale.linear([min, max]).range([2, 40]);
+        } else {
+            var scale = new chroma.ColorScale({
+                colors: ["#FFFFCC", "#A1DAB4", "#41B6C4", "#2C7FB8", "#253494",  "#3194AA"],
+                limits: chroma.limits(objs, 'equal', 100, "ct")
+            });
+        }
+
+        // Cache the value
+        cache[key] = {
+            min:        min,
+            max:        max,
+            rows:       objs,
+            scale:      scale,
+            what:       what
+        }
+
+        return cache[key]
     }
 
     function updateMapSymbols() {
@@ -133,16 +183,7 @@
          *     * cy := country (optional)
          */
 
-        // Get the map mode (cities or countries)
-        var what = getMapMode();
-        // Choose the right dataset (countries or cities)
-        var data = mapData[what];
-
-        var values = $slider.dateRangeSlider("values");
-        mapDataKey = values.min.getFullYear();
-        // Data we work with (with year)
-        var data = data[mapDataKey] || [];
-        if(data.length == 0) return $workspace.removeClass("loading");
+        var data = getData( getMapMode(), getMapYear() );
 
         // Removes existing symbols
         if(symbols) {
@@ -150,20 +191,16 @@
             map.removeSymbols();
         }
 
-        if(what == "cities") {
-
-            var min   = _.min(data, function(e) { return e.ct }).ct
-            var max   = Math.max( _.max(data, function(e) { return e.ct }).ct, min+1)
-            var scale = $K.scale.linear([min, max]).range([4, 30]);
+        if(data.what == "cities") {
 
             symbols = map.addSymbols({
                 type: $K.Bubble,
-                data: data,
+                data: data.rows,
                 location: function(place) {
                     return [place.lg, place.lt];
                 },
                 radius: function(place) {
-                    var r = scale(place.ct);
+                    var r = data.scale(place.ct);
                     return isNaN(r) ? 0 : r;
                 },
                 sortBy: 'radius desc',
@@ -174,34 +211,29 @@
                 tooltip: createTooltip
             });
 
+
+            map.getLayer('countries').style({
+                fill: "#FFFFC6",
+                stroke: "#FFFFC6"
+            });
+
+        } else {
+
+            var fill = function(l, path) {
+                var place = data.rows[l.iso2]
+                return place ? data.scale.getColor(place["ct"]) : "#FFFFC6"
+            };
+
+            map.getLayer('countries').style({
+                fill: fill,
+                stroke: fill
+            });
         }
 
-        var colorscale = new chroma.ColorScale({
-            colors: ["#FFFFCC", "#A1DAB4", "#41B6C4", "#2C7FB8", "#253494",  "#3194AA"],
-            limits: chroma.limits(data, 'equal', 100, "ct")
-        });
-
-
-        var fill = function(l, path) {
-            var place = data[l.iso2]
-            return what == "countries" && place ? colorscale.getColor(place["ct"]) : "#FFFFC6"
-        };
-
-        map.getLayer('countries').style({
-            fill: fill,
-            stroke: fill
-        })
         // Add tooltips
-        .tooltips(createTooltip)
-        // Add click event
-        .on('click', loadCountrySidebar);
-
-
-        // Keep the spinner until the disclaimer is close
-        if( ! $map.find(".disclaimer").is(":visible") ) {
-            // Removes loading mode
-            $workspace.removeClass("loading");
-        }
+        map.getLayer('countries').tooltips(createTooltip).on('click', loadCountrySidebar);
+        // Removes loading mode
+        $workspace.removeClass("loading");
     }
 
     function defaultMapLayers(m) {
@@ -244,8 +276,7 @@
         if( $map.find(".disclaimer").is(":visible") ) return;
 
         // var ratio = map.viewAB.width / map.viewAB.height;
-        var ratio = 0.4,
-           height = $map.width() * ratio;
+        var ratio = 0.4, height = $map.width() * ratio;
 
         //var height = map.viewAB.height > $map.width() * 0.4 ? $map.width() * 0.4 : map.viewAB.height;
         $map.height(height);
@@ -306,7 +337,7 @@
             },
             defaultValues:{
                 min: new Date(1966,1,1),
-                max: new Date(1985,1,1)
+                max: new Date(1976,1,1)
             }
         });
 
@@ -315,7 +346,7 @@
         timer = $.timer(function() {
 
             var slideValues = $slider.dateRangeSlider("values");
-            $slider.dateRangeSlider('scrollRight', 1);
+            $slider.dateRangeSlider('scrollRight', 2);
 
             if( slideValues.max >= new Date(2010,1,1) ) {
                 stopTimer();
@@ -342,7 +373,7 @@
             // Cursor at the end
             if( slideValues.max >= new Date(2010,1,1) ) {
                 // Re-initialize the slider
-                $slider.dateRangeSlider("values", new Date(1966,1,1), new Date(1985,1,1));
+                $slider.dateRangeSlider("values", new Date(1966,1,1), new Date(1965 + getSlotSize(),1,1));
             }
 
             timer.toggle();
