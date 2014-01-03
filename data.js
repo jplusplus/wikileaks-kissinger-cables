@@ -70,7 +70,7 @@ module.exports = function() {
     });
 
     // Create db connexion (use environment variable if exists)
-    dbClient = new pg.Client(process.env.DATABASE_URL || config.pg.url);
+    dbClient = new pg.Client(config.pg.url || process.env.DATABASE_URL);
     dbClient.connect();
 
     return module.exports;
